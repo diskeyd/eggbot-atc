@@ -13,6 +13,7 @@ def fmt(v):
 
 
 def slot_deg(cfg, tool):
+    # ponytail: always absolute angle, no shortest-direction rotation; add if slot_count grows past 6
     count = int(require(cfg, "atc.slot_count"))
     if not 1 <= tool <= count:
         raise ValueError(f"tool T{tool} outside magazine (slot_count={count})")
@@ -20,7 +21,7 @@ def slot_deg(cfg, tool):
 
 
 def tool_change(cfg, old, new, resume_xy=None):
-    """G-code lines that swap pen `old` (0 = none) for pen `new`."""
+    """G-code lines that swap pen `old` for pen `new`; 0 means no pen (start or end of job)."""
     a = lambda k: fmt(require(cfg, "atc." + k))
     f = f" F{fmt(get(cfg, 'atc.atc_feed', 600))}"
     dwell = fmt(get(cfg, "drawing.pen_dwell_ms", 300) / 1000)
@@ -35,8 +36,11 @@ def tool_change(cfg, old, new, resume_xy=None):
             f"G1 A{a('slide_in_mm')}{f}",
             f"G1 X{a('dock_x')}{f}",
             f"G1 X{a('release_x')}{f}",
-            f"G1 A{a('slide_index_mm')}{f}",
         ]
+        if new == 0:  # end of job: pen returned, nothing to pick up
+            lines += [f"G1 A{a('slide_out_mm')}{f}", "; ATC end"]
+            return lines
+        lines.append(f"G1 A{a('slide_index_mm')}{f}")
     # With no pen the magazine angle is unknown, so index before the slide moves in.
     lines += [
         f"G1 Z{fmt(slot_deg(cfg, new))}{f}",

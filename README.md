@@ -33,7 +33,18 @@ Arduino Mega 2560 + RAMPS 1.4 + grbl-Mega-5X    ← 모터 5축 구동
 
 ## 설치
 
-Python 3.12 이상과 [uv](https://docs.astral.sh/uv/)가 필요합니다.
+Python 3.12 이상과 [uv](https://docs.astral.sh/uv/)가 필요합니다. uv 설치:
+
+```powershell
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+```bash
+# Mac
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+그다음 이 폴더에서:
 
 ```bash
 uv sync
@@ -46,7 +57,7 @@ uv run eggbot-atc check          # 아직 안 잰 값 목록
 uv run eggbot-atc check                                   # machine.toml에서 TODO로 남은 값 나열
 uv run eggbot-atc convert 그림.svg -o 출력.gcode            # 변환 + ATC 삽입 (TODO가 남아 있으면 거부)
 uv run eggbot-atc settings > grbl_settings.txt            # GRBL $ 설정값 생성 (UGS 콘솔에 붙여넣기)
-uv run eggbot-atc send 출력.gcode --port /dev/tty.usbmodemXXXX   # 디버그용 직접 전송 (평소엔 UGS 사용)
+uv run eggbot-atc send 출력.gcode --port COM3              # 디버그용 직접 전송 (평소엔 UGS 사용). Mac은 /dev/tty.usbmodemXXXX
 ```
 
 `--config 다른파일.toml`을 명령 앞에 붙이면 다른 설정 파일을 씁니다. 기계 없이 돌려 보려면:
@@ -112,6 +123,8 @@ G1 A{slide_out} ; 6 슬라이드 후퇴
 ; ATC end
 G0 X.. Y..      ;   그리던 곳으로 복귀 후 펜 내림
 ```
+
+파일 끝에서는 마지막 펜을 매거진에 반납하고 `G0 X0 Y0 Z0 A0`으로 영점 자세로 돌아갑니다. 그래서 연속으로 여러 도안을 돌릴 때 다시 영점을 잡을 필요가 없습니다. **중간에 멈췄다면** 펜을 손으로 슬롯에 돌려놓고 영점을 다시 잡거나, 다음 실행 전에 `initial_tool`을 지금 물고 있는 펜 번호로 바꾸세요.
 
 시작할 때(펜 없음, `initial_tool = 0`)는 반납 단계를 건너뛰고 **Z 인덱싱을 먼저** 한 뒤 슬라이드를 밀어 넣습니다. 부팅 직후 매거진 각도가 슬롯에 안 맞은 채로 슬라이드부터 밀면 부딪히기 때문입니다.
 

@@ -32,10 +32,17 @@ def atc_blocks(lines):
 def test_three_layers_three_tool_changes(cfg):
     lines = convert(HERE / "sample.svg", cfg)
     blocks = atc_blocks(lines)
-    assert [b[0] for b in blocks] == ["; ATC T0 -> T1", "; ATC T1 -> T2", "; ATC T2 -> T3"]
+    assert [b[0] for b in blocks] == ["; ATC T0 -> T1", "; ATC T1 -> T2", "; ATC T2 -> T3", "; ATC T3 -> T0"]
     assert lines[:5] == ["; eggbot-atc", "G21", "G90", "G17", "G92 X0 Y0 Z0 A0"]
-    assert lines[-2:] == ["G0 X0 Y0", "M2"]
+    assert lines[-2:] == ["G0 X0 Y0 Z0 A0", "M2"]
     assert "M5" not in lines
+
+
+def test_job_ends_with_pen_returned(cfg):
+    last = atc_blocks(convert(HERE / "sample.svg", cfg))[-1]
+    assert "G1 X70 F600" in last  # release_x: pen left in its slot
+    assert not any(l.startswith("G1 Z") for l in last)  # no indexing, nothing to pick up
+    assert last[-2] == "G1 A0 F600"  # slide fully out
 
 
 def test_first_change_indexes_before_slide_and_skips_release(cfg):
@@ -50,14 +57,14 @@ def test_first_change_indexes_before_slide_and_skips_release(cfg):
 
 def test_slot_angles(cfg):
     blocks = atc_blocks(convert(HERE / "sample.svg", cfg))
-    zs = [next(l for l in b if l.startswith("G1 Z")) for b in blocks]
+    zs = [next(l for l in b if l.startswith("G1 Z")) for b in blocks[:3]]
     assert zs == ["G1 Z10 F600", "G1 Z130 F600", "G1 Z250 F600"]
 
 
 def test_resume_at_first_point_then_pen_down(cfg):
     blocks = load_layers(HERE / "sample.svg", cfg)
     lines = convert(HERE / "sample.svg", cfg)
-    for (_, polylines), block in zip(blocks, atc_blocks(lines)):
+    for (_, polylines), block in zip(blocks, atc_blocks(lines)[:3]):
         i = lines.index("; ATC end", lines.index(block[0]))
         x, y = polylines[0][0]
         assert lines[i + 1] == f"G0 X{x:.3f}".rstrip("0").rstrip(".") + f" Y{y:.3f}".rstrip("0").rstrip(".")

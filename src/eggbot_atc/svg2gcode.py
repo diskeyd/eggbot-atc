@@ -32,7 +32,7 @@ def _flatten(group, step_px):
             elif kind in ("Line", "Close"):
                 cur.append((seg.end.x, seg.end.y))
             else:  # CubicBezier, QuadraticBezier, Arc
-                n = max(2, int(seg.length() / step_px) + 1)
+                n = max(2, int(seg.length(error=1e-3) / step_px) + 1)  # default 1e-12 takes seconds per curve
                 cur.extend((p.x, p.y) for p in (seg.point(i / n) for i in range(1, n + 1)))
         if len(cur) > 1:
             yield cur
@@ -83,8 +83,11 @@ def assemble(cfg, blocks):
             lines += tool_change(cfg, tool, new)
             tool = new
         lines += emit_block(polylines, cfg)
-    # No M5 at the end: with the servo on spindle PWM, M5 would slam the pen to duty 0.
-    lines += [up, "G0 X0 Y0", "M2"]
+    # Return the pen and go back to the zero pose so the next run's G92 and
+    # initial_tool = 0 are true again. No M5: on spindle PWM it would slam the servo to duty 0.
+    if tool:
+        lines += tool_change(cfg, tool, 0)
+    lines += [up, "G0 X0 Y0 Z0 A0", "M2"]
     return lines
 
 
