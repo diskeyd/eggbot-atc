@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     width="120mm" height="60mm" viewBox="0 0 120 60">
+  <g inkscape:groupmode="layer" id="layer1" inkscape:label="T1 red">
+    <path d="M 10,10 L 50,10 C 60,20 70,0 80,10" style="fill:none;stroke:#ff0000"/>
+  </g>
+  <g inkscape:groupmode="layer" id="layer2" inkscape:label="T2 blue">
+    <path d="M 10,30 L 50,30 L 50,40" style="fill:none;stroke:#0000ff"/>
+  </g>
+  <g inkscape:groupmode="layer" id="layer3" inkscape:label="T3 green" transform="translate(0,5)">
+    <circle cx="90" cy="40" r="8" style="fill:none;stroke:#00aa00"/>
+  </g>
+</svg>

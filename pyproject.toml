@@ -1,0 +1,25 @@
+[project]
+name = "eggbot-atc"
+version = "0.1.0"
+description = "SVG to G-code converter with automatic pen change (ATC) macros for a multi-color EggBot on grbl-Mega-5X"
+readme = "README.md"
+authors = [
+    { name = "diskeyd" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "pyserial>=3.5",
+    "svgelements>=1.9.6",
+]
+
+[project.scripts]
+eggbot-atc = "eggbot_atc.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]

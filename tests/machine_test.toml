@@ -1,0 +1,35 @@
+# Fully filled-in config for tests and dry runs. Numbers are placeholders, not measurements.
+[machine]
+motor_steps = 200
+microsteps = 32
+x_lead_mm = 8
+y_gear_ratio = 1
+z_gear_ratio = 1
+a_lead_mm = 8
+x_max_mm = 80
+
+[drawing]
+svg_width_mm = 60
+y_invert = false
+flatten_mm = 0.5
+draw_feed = 1500
+travel_feed = 3000
+pen_up_cmd = "M3 S90"
+pen_down_cmd = "M3 S30"
+pen_dwell_ms = 300
+home_cmd = "G92 X0 Y0 Z0 A0"
+
+[atc]
+slot_count = 3
+initial_tool = 0
+park_x = 75
+dock_x = 78
+release_x = 70
+slide_in_mm = 20
+slide_index_mm = 15
+slide_out_mm = 0
+slot0_deg = 10
+atc_feed = 600
+
+[grbl]
+x_max_rate = 3000

@@ -1,0 +1,41 @@
+# eggbot-atc machine configuration.
+# "TODO" = not measured yet. The program refuses to convert while any TODO remains
+# (a slide or magazine driven to 0 by accident can break the mechanism).
+# All positions are absolute machine coordinates after the zeroing routine in README.
+
+[machine]
+motor_steps = 200          # NEMA 17, 1.8 deg/step
+microsteps = 32            # TMC2209
+x_lead_mm = 8              # T8 lead screw: 8 mm per revolution (4-start, 2 mm pitch). Verify.
+y_gear_ratio = 1           # egg spindle directly on the motor = 1
+z_gear_ratio = 1           # magazine directly on the motor = 1
+a_lead_mm = "TODO"         # slide: mm per motor revolution (lead screw lead or belt pulley circumference)
+x_max_mm = "TODO"          # usable X travel
+
+[drawing]
+svg_width_mm = "TODO"      # X travel that the full SVG width maps to (SVG height always = 360 deg)
+y_invert = false           # SVG y grows downward; set true to flip rotation direction
+flatten_mm = 0.5           # curve sampling step
+draw_feed = 1500           # mm/min (Y counts degrees as mm)
+travel_feed = 3000
+pen_up_cmd = "M3 S90"      # S is PWM duty 0..$30, not degrees. With the servo fork use e.g. "M96 A400"
+pen_down_cmd = "M3 S30"
+pen_dwell_ms = 300         # wait after each servo move (emitted as G4 P0.3, seconds)
+home_cmd = "G92 X0 Y0 Z0 A0"   # manual zeroing; switch to "$H" once endstops are wired
+
+[atc]
+slot_count = 3             # pens in the magazine
+initial_tool = 0           # 0 = no pen in the carriage at start
+park_x = "TODO"            # X where the carriage waits before the slide moves
+dock_x = "TODO"            # X where the pen is fully seated in the magazine slot / coupling
+release_x = "TODO"         # X where the carriage has pulled clear of the pen it left behind
+slide_in_mm = "TODO"       # A: magazine pushed against the carriage
+slide_index_mm = "TODO"    # A: backed off just enough for the magazine to rotate
+slide_out_mm = "TODO"      # A: fully retracted (drawing position)
+slot0_deg = "TODO"         # Z angle of slot 1; slot n = slot0 + (n-1)*360/slot_count
+atc_feed = 600             # feed for all ATC moves
+
+[grbl]
+# Optional overrides for $110-$133 (max rate, accel, max travel). Missing = TODO in `settings` output.
+# x_max_rate = 3000
+# y_max_rate = 3000
