@@ -42,7 +42,7 @@ def test_job_ends_with_pen_returned(cfg):
     last = atc_blocks(convert(HERE / "sample.svg", cfg))[-1]
     assert "G1 X70 F600" in last  # release_x: pen left in its slot
     assert not any(l.startswith("G1 Z") for l in last)  # no indexing, nothing to pick up
-    assert last[-2] == "G1 A0 F600"  # slide fully out
+    assert last[-1] == "G1 A0 F600"  # slide fully out (helper strips "; ATC end")
 
 
 def test_first_change_indexes_before_slide_and_skips_release(cfg):
