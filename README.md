@@ -88,6 +88,8 @@ uv run eggbot-atc --config tests/machine_test.toml convert tests/sample.svg -o o
 
 ## 측정 체크리스트 (`machine.toml`의 TODO)
 
+전체 설정값(추정치·튜닝값 포함)은 [docs/설정값-목록.md](docs/설정값-목록.md)에 정리돼 있습니다.
+
 UGS 조그로 축을 움직이고, 화면에 보이는 기계 좌표를 읽어 적습니다. 다 채우면 `uv run eggbot-atc check`가 `all measured`를 출력합니다.
 
 | 키 | 무엇 | 어떻게 재나 |
@@ -95,6 +97,7 @@ UGS 조그로 축을 움직이고, 화면에 보이는 기계 좌표를 읽어 �
 | `machine.a_lead_mm` | 슬라이드 모터 1회전당 이동 mm | 리드스크루면 리드값, 벨트면 풀리 둘레. 모르면 `G91 G1 A10`을 보내고 실제 이동량을 자로 재서 비례 보정 |
 | `machine.x_max_mm` | X 최대 이동거리 | 왼쪽 끝 영점에서 오른쪽 끝까지 조그 |
 | `drawing.svg_width_mm` | 그림 가로가 대응될 X 거리 | 계란 위에서 펜이 그릴 수 있는 좌우 길이 |
+| `drawing.x_offset_mm` | 그림 왼쪽 끝이 놓일 X | 펜이 계란 그림 영역 왼쪽 끝에 닿는 X. `x_offset_mm + svg_width_mm ≤ x_max_mm` |
 | `atc.park_x` | 교체 대기 X | 슬라이드가 들어와도 펜/팔과 안 부딪히는 X |
 | `atc.dock_x` | 펜이 슬롯에 완전히 물리는 X | 슬라이드 `slide_in_mm` 상태에서 X를 천천히 밀어 자석+테이퍼 핀이 딱 맞는 곳 |
 | `atc.release_x` | 펜을 두고 팔만 빠진 X | dock_x에서 뒤로 빼서 자석이 완전히 떨어지는 곳 |
@@ -149,7 +152,7 @@ uv run eggbot-atc settings
 ## 개발
 
 ```bash
-uv run pytest        # 기계 없이 돌아가는 테스트 8개
+uv run pytest        # 기계 없이 돌아가는 테스트
 ```
 
 기계·서보·시리얼 전송은 하드웨어가 없어 **검증되지 않았습니다.** 조립 후 첫 시운전은 펜 없이, 속도(`atc_feed`)를 낮춰서 하세요.
