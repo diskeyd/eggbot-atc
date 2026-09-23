@@ -41,7 +41,11 @@ def _flatten(group, step_px):
 def load_layers(svg_path, cfg):
     """Return [(tool_no, [polyline_in_machine_units, ...]), ...] in drawing order."""
     svg = SVG.parse(svg_path, reify=True)
-    sx = float(require(cfg, "drawing.svg_width_mm")) / svg.width
+    width = float(require(cfg, "drawing.svg_width_mm"))
+    x0 = float(require(cfg, "drawing.x_offset_mm"))
+    if x0 < 0 or x0 + width > float(require(cfg, "machine.x_max_mm")):
+        raise ValueError("x_offset_mm + svg_width_mm must fit inside 0..x_max_mm")
+    sx = width / svg.width
     sy = 360.0 / svg.height
     invert = bool(get(cfg, "drawing.y_invert", False))
     step_px = float(get(cfg, "drawing.flatten_mm", 0.5)) / sx
@@ -53,7 +57,7 @@ def load_layers(svg_path, cfg):
         m = _LABEL_TOOL.search(layer.values.get(_INK + "label", ""))
         tool = int(m.group(1)) if m else i
         polylines = [
-            [(x * sx, (svg.height - y if invert else y) * sy) for x, y in pl]
+            [(x0 + x * sx, (svg.height - y if invert else y) * sy) for x, y in pl]
             for pl in _flatten(layer, step_px)
         ]
         if polylines:

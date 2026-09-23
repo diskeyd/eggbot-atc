@@ -10,6 +10,7 @@ x_max_mm = 80
 
 [drawing]
 svg_width_mm = 60
+x_offset_mm = 0
 y_invert = false
 flatten_mm = 0.5
 draw_feed = 1500

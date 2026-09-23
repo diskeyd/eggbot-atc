@@ -80,6 +80,15 @@ def test_scale_and_transform(cfg):
     assert round((max(ys) + min(ys)) / 2, 1) == 270.0
 
 
+def test_x_offset_shifts_drawing_and_must_fit(cfg):
+    cfg["drawing"]["x_offset_mm"] = 15
+    x, _ = dict(load_layers(HERE / "sample.svg", cfg))[1][0][0]
+    assert round(x, 3) == 20.0  # 15 mm offset + 5 mm from the SVG
+    cfg["drawing"]["x_offset_mm"] = 25  # 25 + 60 mm > x_max_mm 80
+    with pytest.raises(ValueError):
+        load_layers(HERE / "sample.svg", cfg)
+
+
 def test_template_refuses_until_measured():
     cfg = config.load(ROOT / "machine.toml")
     assert config.missing(cfg) == config.REQUIRED_FOR_CONVERT

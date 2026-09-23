@@ -14,6 +14,7 @@ x_max_mm = "TODO"          # usable X travel
 
 [drawing]
 svg_width_mm = "TODO"      # X travel that the full SVG width maps to (SVG height always = 360 deg)
+x_offset_mm = "TODO"       # X where the SVG left edge lands (pen over the egg's drawable area)
 y_invert = false           # SVG y grows downward; set true to flip rotation direction
 flatten_mm = 0.5           # curve sampling step
 draw_feed = 1500           # mm/min (Y counts degrees as mm)

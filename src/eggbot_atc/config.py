@@ -6,7 +6,10 @@ TODO = "TODO"
 
 # Keys that must be measured before a drawing can be converted.
 REQUIRED_FOR_CONVERT = [
+    "machine.a_lead_mm",
+    "machine.x_max_mm",
     "drawing.svg_width_mm",
+    "drawing.x_offset_mm",
     "atc.slot0_deg",
     "atc.park_x",
     "atc.dock_x",
