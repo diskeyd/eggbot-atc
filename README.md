@@ -89,6 +89,7 @@ uv run eggbot-atc --config tests/machine_test.toml convert tests/sample.svg -o o
 ## 측정 체크리스트 (`machine.toml`의 TODO)
 
 전체 설정값(추정치·튜닝값 포함)은 [docs/설정값-목록.md](docs/설정값-목록.md)에 정리돼 있습니다.
+부품 구매 목록과 빠진 부품은 [docs/부품-목록.md](docs/부품-목록.md)에 있습니다.
 
 UGS 조그로 축을 움직이고, 화면에 보이는 기계 좌표를 읽어 적습니다. 다 채우면 `uv run eggbot-atc check`가 `all measured`를 출력합니다.
 
