@@ -113,3 +113,10 @@ def test_existing_gcode_tool_lines_replaced(cfg):
     assert "G0 X8 Y9" in out  # resumes where the T2 line was reached
     assert not any(l.strip().startswith(("T", "M6")) for l in out)
     assert out[-1] == "G1 X1 Y1"
+
+
+def test_cam_tool_line_forms(cfg):
+    for line in ["M06 T2", "M6T2", "N10 T2 M6"]:
+        out = insert_tool_changes(cfg, ["G0 X5 Y6", line, "G1 X1 Y1"])
+        assert "; ATC T0 -> T2" in out, line
+    assert insert_tool_changes(cfg, ["G0 X1 T2"]) == ["G0 X1 T2"]  # T mid-line is not a change

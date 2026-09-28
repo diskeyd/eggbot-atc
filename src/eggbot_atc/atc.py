@@ -54,7 +54,8 @@ def tool_change(cfg, old, new, resume_xy=None):
     return lines
 
 
-_TOOL = re.compile(r"^\s*(?:M6\s+)?T(\d+)\b", re.IGNORECASE)
+# Also CAM forms: "M06 T2", "M6T2", "N10 T2 M6".
+_TOOL = re.compile(r"^\s*(?:N\d+\s*)?(?:M0?6\s*)?T(\d+)\b", re.IGNORECASE)
 _X = re.compile(r"\bX(-?\d*\.?\d+)", re.IGNORECASE)
 _Y = re.compile(r"\bY(-?\d*\.?\d+)", re.IGNORECASE)
 
