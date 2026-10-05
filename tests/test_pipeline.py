@@ -73,7 +73,7 @@ def test_resume_at_first_point_then_pen_down(cfg):
 
 def test_scale_and_transform(cfg):
     blocks = dict(load_layers(HERE / "sample.svg", cfg))
-    x, y = blocks[1][0][0]  # (10,10) on a 120x60 canvas -> 60 mm wide, 360 deg tall
+    x, y = blocks[1][0][0]  # (10,10) on a 120x60 canvas -> 60 deg wide, 360 deg tall
     assert (round(x, 3), round(y, 3)) == (5.0, 60.0)
     assert len(blocks[1][0]) > 3  # bezier got flattened
     ys = [p[1] for p in blocks[3][0]]  # circle translated by 5 units: centre 45 -> 270 deg
@@ -81,10 +81,10 @@ def test_scale_and_transform(cfg):
 
 
 def test_x_offset_shifts_drawing_and_must_fit(cfg):
-    cfg["drawing"]["x_offset_mm"] = 15
+    cfg["drawing"]["x_offset_deg"] = 15
     x, _ = dict(load_layers(HERE / "sample.svg", cfg))[1][0][0]
-    assert round(x, 3) == 20.0  # 15 mm offset + 5 mm from the SVG
-    cfg["drawing"]["x_offset_mm"] = 25  # 25 + 60 mm > x_max_mm 80
+    assert round(x, 3) == 20.0  # 15 deg offset + 5 deg from the SVG
+    cfg["drawing"]["x_offset_deg"] = 25  # 25 + 60 > x_max_deg 80
     with pytest.raises(ValueError):
         load_layers(HERE / "sample.svg", cfg)
 
@@ -98,12 +98,13 @@ def test_template_refuses_until_measured():
 
 def test_grbl_settings(cfg):
     out = settings(cfg)
-    assert "$100=800  ; X steps/mm = motor_steps*microsteps/x_lead_mm" in out
+    assert "$100=17.778  ; X steps/deg (1 unit = 1 deg of pen arm)" in out
+    assert any(l.startswith("$103=800") for l in out)
     assert any(l.startswith("$101=17.778") for l in out)
     assert any(l.startswith("$110=3000") for l in out)
     assert any(l.startswith("; $111=TODO") for l in out)
     template = settings(config.load(ROOT / "machine.toml"))
-    assert any(l.startswith("; $103=TODO") for l in template)
+    assert any(l.startswith("; $130=TODO") for l in template)
 
 
 def test_existing_gcode_tool_lines_replaced(cfg):

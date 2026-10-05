@@ -1,6 +1,6 @@
 """Automatic pen change macro. grbl-Mega-5X has no M6, so the host expands it.
 
-Axes: X pen carriage (mm), Y egg rotation (deg), Z magazine index (deg), A slide (mm).
+Axes: X pen arm angle (deg), Y egg rotation (deg), Z magazine index (deg), A slide (mm).
 """
 
 import re

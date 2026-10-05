@@ -6,18 +6,18 @@
 [machine]
 motor_steps = 200          # NEMA 17, 1.8 deg/step
 microsteps = 32            # TMC2209
-x_lead_mm = 8              # T8 lead screw: 8 mm per revolution (4-start, 2 mm pitch). Verify.
+x_gear_ratio = 1           # pen arm directly on the motor shaft = 1 (X counts degrees)
 y_gear_ratio = 1           # egg spindle directly on the motor = 1
 z_gear_ratio = 1           # magazine directly on the motor = 1
-a_lead_mm = "TODO"         # slide: mm per motor revolution (lead screw lead or belt pulley circumference)
-x_max_mm = "TODO"          # usable X travel
+a_lead_mm = 8              # slide T8 lead screw: 8 mm per revolution (4-start, 2 mm pitch). Verify.
+x_max_deg = "TODO"         # usable pen arm swing
 
 [drawing]
-svg_width_mm = "TODO"      # X travel that the full SVG width maps to (SVG height always = 360 deg)
-x_offset_mm = "TODO"       # X where the SVG left edge lands (pen over the egg's drawable area)
+svg_width_deg = "TODO"     # arm swing that the full SVG width maps to (SVG height always = 360 deg)
+x_offset_deg = "TODO"      # X where the SVG left edge lands (pen over the egg's drawable area)
 y_invert = false           # SVG y grows downward; set true to flip rotation direction
 flatten_mm = 0.5           # curve sampling step
-draw_feed = 1500           # mm/min (Y counts degrees as mm)
+draw_feed = 1500           # mm/min (X and Y count degrees as mm)
 travel_feed = 3000
 pen_up_cmd = "M3 S90"      # S is PWM duty 0..$30, not degrees. With the servo fork use e.g. "M96 A400"
 pen_down_cmd = "M3 S30"

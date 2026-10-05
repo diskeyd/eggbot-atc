@@ -2,15 +2,15 @@
 [machine]
 motor_steps = 200
 microsteps = 32
-x_lead_mm = 8
+x_gear_ratio = 1
 y_gear_ratio = 1
 z_gear_ratio = 1
 a_lead_mm = 8
-x_max_mm = 80
+x_max_deg = 80
 
 [drawing]
-svg_width_mm = 60
-x_offset_mm = 0
+svg_width_deg = 60
+x_offset_deg = 0
 y_invert = false
 flatten_mm = 0.5
 draw_feed = 1500

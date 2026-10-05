@@ -1,7 +1,7 @@
 """SVG (one Inkscape layer per pen, label "T1 red") -> G-code with ATC macros.
 
 Canvas convention: full SVG height = one egg revolution (360 deg on Y),
-full SVG width = drawing.svg_width_mm on X.
+full SVG width = drawing.svg_width_deg of pen arm swing on X.
 """
 
 import re
@@ -41,10 +41,10 @@ def _flatten(group, step_px):
 def load_layers(svg_path, cfg):
     """Return [(tool_no, [polyline_in_machine_units, ...]), ...] in drawing order."""
     svg = SVG.parse(svg_path, reify=True)
-    width = float(require(cfg, "drawing.svg_width_mm"))
-    x0 = float(require(cfg, "drawing.x_offset_mm"))
-    if x0 < 0 or x0 + width > float(require(cfg, "machine.x_max_mm")):
-        raise ValueError("x_offset_mm + svg_width_mm must fit inside 0..x_max_mm")
+    width = float(require(cfg, "drawing.svg_width_deg"))
+    x0 = float(require(cfg, "drawing.x_offset_deg"))
+    if x0 < 0 or x0 + width > float(require(cfg, "machine.x_max_deg")):
+        raise ValueError("x_offset_deg + svg_width_deg must fit inside 0..x_max_deg")
     sx = width / svg.width
     sy = 360.0 / svg.height
     invert = bool(get(cfg, "drawing.y_invert", False))
