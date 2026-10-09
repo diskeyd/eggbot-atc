@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import pytest
@@ -120,7 +121,8 @@ def test_existing_gcode_tool_lines_replaced(cfg):
     assert out[:2] == ["G0 X5 Y6", "; ATC T0 -> T1"]
     assert "G0 X8 Y9" in out  # resumes where the T2 line was reached
     assert not any(l.strip().startswith(("T", "M6")) for l in out)
-    assert out[-1] == "G1 X1 Y1"
+    assert out[-1] == "G0 X0 Y0 Z0 A0"  # last pen returned, zero pose for the next run
+    assert out[out.index("; ATC T2 -> T0") - 1] == "G1 X1 Y1"
 
 
 def test_cam_tool_line_forms(cfg):
@@ -128,3 +130,21 @@ def test_cam_tool_line_forms(cfg):
         out = insert_tool_changes(cfg, ["G0 X5 Y6", line, "G1 X1 Y1"])
         assert "; ATC T0 -> T2" in out, line
     assert insert_tool_changes(cfg, ["G0 X1 T2"]) == ["G0 X1 T2"]  # T mid-line is not a change
+
+
+def test_existing_gcode_returns_last_pen_before_program_end(cfg):
+    out = insert_tool_changes(cfg, ["T1", "G1 X1 Y1", "M30"])
+    assert out[-1] == "M30"
+    assert out[-2] == "G0 X0 Y0 Z0 A0"
+    assert "; ATC T1 -> T0" in out
+
+
+def test_plain_svg_gcode_matches_direct_convert(cfg):
+    from eggbot_atc.svg2gcode import plain
+
+    direct = convert(HERE / "sample.svg", cfg)
+    via_t_lines = insert_tool_changes(cfg, plain(cfg, load_layers(HERE / "sample.svg", cfg)))
+    def macro_only(blocks):  # T-line input also resumes at the last point; drop those moves
+        return [[l for l in b if not re.match(r"G0 X[-\d.]+ Y", l)] for b in blocks]
+
+    assert macro_only(atc_blocks(via_t_lines)) == macro_only(atc_blocks(direct))

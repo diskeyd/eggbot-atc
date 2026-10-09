@@ -1,9 +1,11 @@
+import tkinter as tk
 import tomllib
 from pathlib import Path
 
-from eggbot_atc import config
-from eggbot_atc.gui import parse_value, preview_segments, set_toml_value
-from eggbot_atc.svg2gcode import convert
+import pytest
+
+from eggbot_atc import config, gui
+from eggbot_atc.gui import map_tools, parse_value, set_toml_value
 
 HERE = Path(__file__).parent
 ROOT = HERE.parent
@@ -20,12 +22,52 @@ def test_settings_write_keeps_comments_and_other_sections():
     assert "# X where the arm (pen on its magnets) meets the magazine fork" in text
 
 
-def test_preview_draws_only_pen_down_moves_outside_atc():
-    cfg = config.load(HERE / "machine_test.toml")
-    lines = convert(HERE / "sample.svg", cfg)
-    segs = preview_segments(lines, cfg)
-    drawn = [s for s in segs if s and s[4]]
-    assert {s[5] for s in drawn} == {1, 2, 3}  # one colour per pen
-    for i, line in enumerate(lines):  # nothing inside a pen change is drawn
-        if line.startswith(("G0 X75", "G1 A", "G1 Z")):
-            assert segs[i] is None
+def test_layer_colour_sets_pen_number():
+    src = ["G21", "T1", "G1 X1 Y1", "M6 T2", "G1 X2 Y2"]
+    assert map_tools(src, [1, 3], [3, 1]) == ["G21", "T3", "G1 X1 Y1", "T1", "G1 X2 Y2"]
+    assert map_tools(["G21", "G0 X1 Y1"], [], [2]) == ["G21", "T2", "G0 X1 Y1"]  # no tool line
+
+
+@pytest.fixture
+def app(tmp_path, monkeypatch):
+    (tmp_path / "machine.toml").write_text((HERE / "machine_test.toml").read_text(encoding="utf-8"), encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    shown = []
+    for name in ("showinfo", "showwarning", "showerror"):
+        monkeypatch.setattr(gui.messagebox, name, lambda *a, _n=name, **k: shown.append((_n, a)))
+    try:
+        root = tk.Tk()
+    except tk.TclError:
+        pytest.skip("no display")
+    root.withdraw()
+    a = gui.UltimateATCGCodeApp(root)
+    a.shown = shown
+    yield a
+    root.destroy()
+
+
+def test_window_converts_svg_with_layer_colours(app, monkeypatch):
+    monkeypatch.setattr(gui.filedialog, "askopenfilename", lambda **k: str(HERE / "sample.svg"))
+    app.load_file_dialog()
+    assert [c.get() for c in app.layer_combos] == ["빨강색", "파랑색", "초록색"]
+    app.layer_combos[0].set("초록색")  # layer 1 drawn with pen 3
+    app.apply_atc_conversion()
+    lines = [l.rstrip("\n") for l in app.gcode_lines]
+    assert [l for l in lines if l.startswith("; ATC T")] == [
+        "; ATC T0 -> T3", "; ATC T3 -> T2", "; ATC T2 -> T3", "; ATC T3 -> T0"]
+    assert "G4 P0.3" in lines and "G4 P300" not in lines
+    assert not app.preview_only and app.shown[-1][0] == "showinfo"
+
+
+def test_window_blocks_save_until_measured(app, monkeypatch):
+    text = set_toml_value(app.cfg_path.read_text(encoding="utf-8"), "atc.park_x", "TODO")
+    app.cfg_path.write_text(text, encoding="utf-8")
+    app.cfg = config.load(app.cfg_path)
+    monkeypatch.setattr(gui.filedialog, "askopenfilename", lambda **k: str(HERE / "sample.svg"))
+    app.load_file_dialog()
+    app.apply_atc_conversion()
+    assert app.preview_only
+    saved = []
+    monkeypatch.setattr(gui.filedialog, "asksaveasfilename", lambda **k: saved.append(1) or "x.gcode")
+    app.save_file()
+    assert not saved and app.shown[-1][0] == "showerror"

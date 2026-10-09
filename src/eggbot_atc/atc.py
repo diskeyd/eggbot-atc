@@ -66,6 +66,7 @@ def tool_change(cfg, old, new, resume_xy=None):
 _TOOL = re.compile(r"^\s*(?:N\d+\s*)?(?:M0?6\s*)?T(\d+)\b", re.IGNORECASE)
 _X = re.compile(r"\bX(-?\d*\.?\d+)", re.IGNORECASE)
 _Y = re.compile(r"\bY(-?\d*\.?\d+)", re.IGNORECASE)
+_END = re.compile(r"^\s*(?:N\d+\s*)?M0?(?:2|30)\b", re.IGNORECASE)
 
 
 def insert_tool_changes(cfg, lines):
@@ -86,4 +87,7 @@ def insert_tool_changes(cfg, lines):
             resume = (last["X"], last["Y"]) if {"X", "Y"} <= last.keys() else None
             out += tool_change(cfg, tool, new, resume)
             tool = new
+    if tool:  # return the last pen and go to the zero pose, before a trailing M2/M30
+        end = next((i for i in range(len(out) - 1, -1, -1) if _END.match(out[i])), len(out))
+        out[end:end] = tool_change(cfg, tool, 0) + ["G0 X0 Y0 Z0 A0"]
     return out

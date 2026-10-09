@@ -95,5 +95,14 @@ def assemble(cfg, blocks):
     return lines
 
 
+def plain(cfg, blocks):
+    """Drawing G-code with a `T<n>` line before each layer and no ATC macros (input for insert_tool_changes)."""
+    up = require(cfg, "drawing.pen_up_cmd")
+    lines = ["; eggbot-atc", "G21", "G90", "G17", get(cfg, "drawing.home_cmd", "G92 X0 Y0 Z0 A0"), up]
+    for tool, polylines in blocks:
+        lines += [f"T{tool}"] + emit_block(polylines, cfg)
+    return lines + [up, "M2"]
+
+
 def convert(svg_path, cfg):
     return assemble(cfg, load_layers(svg_path, cfg))
