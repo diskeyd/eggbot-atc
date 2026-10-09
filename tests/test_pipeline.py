@@ -101,6 +101,7 @@ def test_grbl_settings(cfg):
     assert "$100=17.778  ; X steps/deg (1 unit = 1 deg of pen arm)" in out
     assert any(l.startswith("$103=800") for l in out)
     assert any(l.startswith("$101=17.778") for l in out)
+    assert any(l.startswith("$104=17.778") for l in out)  # second egg motor mirrors Y
     assert any(l.startswith("$110=3000") for l in out)
     assert any(l.startswith("; $111=TODO") for l in out)
     template = settings(config.load(ROOT / "machine.toml"))

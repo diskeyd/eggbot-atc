@@ -29,6 +29,7 @@ Arduino Mega 2560 + RAMPS 1.4 + grbl-Mega-5X    ← 모터 5축 구동
 | Y | 계란 회전 | 도(°) |
 | Z | 매거진(펜 보관통) 회전 | 도(°) |
 | A | ATC 슬라이드 이송 (T8 리드스크루, Ø8 샤프트 2개) | mm |
+| (5번 축) | 계란 반대쪽 모터. 펌웨어에서 Y로 복제해 Y와 똑같이 돎 | 도(°) |
 | 서보 | 펜 올리기/내리기 | `M3 S…` PWM |
 
 ## 설치
@@ -89,7 +90,7 @@ uv run eggbot-atc --config tests/machine_test.toml convert tests/sample.svg -o o
 ## 측정 체크리스트 (`machine.toml`의 TODO)
 
 전체 설정값(추정치·튜닝값 포함)은 [docs/설정값-목록.md](docs/설정값-목록.md)에 정리돼 있습니다.
-부품 구매 목록과 빠진 부품은 [docs/부품-목록.md](docs/부품-목록.md)에 있습니다.
+부품 구매 목록과 빠진 부품은 [docs/부품-목록.md](docs/부품-목록.md), 배선은 [docs/배선도.md](docs/배선도.md)에 있습니다.
 도면(2026-10-02)에서 옮긴 부품 치수와 도면 확인 사항은 [docs/기구-치수.md](docs/기구-치수.md)에 있습니다.
 공유받은 `변환 프로그램.exe`와의 차이는 [docs/변환프로그램-비교.md](docs/변환프로그램-비교.md)에 있습니다.
 
@@ -138,7 +139,7 @@ G0 X.. Y..      ;   그리던 곳으로 복귀 후 펜 내림
 ## 서보(펜 승하강) 주의
 
 - grbl-Mega-5X 기본 펌웨어에는 서보 명령이 없어 **스핀들 PWM(`M3 S…`)** 으로 대신합니다. `S`는 각도가 아니라 0~`$30`(=255) 범위의 듀티 값입니다. `M3 S90`/`M3 S30`은 출발점일 뿐, 실제 올라감/내려감 값은 튜닝해서 `pen_up_cmd`/`pen_down_cmd`에 넣습니다.
-- **RAMPS의 기본 스핀들 PWM 핀 D8은 12 V MOSFET 출력입니다. 서보 신호선을 절대 연결하지 마세요.** 펌웨어 `config.h`에서 `SPINDLE_PWM_ON_D6`(RAMPS 서보 헤더의 D6, 5 V 로직)로 옮긴 뒤 그 핀에 연결합니다. 펌웨어가 고를 수 있는 핀은 D8/D6/D9뿐이고, D9도 RAMPS에서는 12 V MOSFET(팬) 출력이라 쓸 수 없습니다. 서보 전원은 Mega 5 V가 아니라 5 V DC-DC에서 받습니다 ([부품 목록](docs/부품-목록.md) 4장).
+- **RAMPS의 기본 스핀들 PWM 핀 D8은 12 V MOSFET 출력입니다. 서보 신호선을 절대 연결하지 마세요.** 펌웨어 `config.h`에서 `SPINDLE_PWM_ON_D6`(RAMPS 서보 헤더의 D6, 5 V 로직)로 옮긴 뒤 그 핀에 연결합니다. `config.h`에서 고를 수 있는 핀은 D8(기본)과 D6뿐입니다. D9는 쿨런트(미스트) 출력이자 RAMPS의 12 V MOSFET이라 쓸 수 없습니다. 서보 전원은 Mega 5 V가 아니라 5 V DC-DC에서 받습니다 ([부품 목록](docs/부품-목록.md) 4장).
 - MG90S가 PWM으로 안 움직이면(관련 이슈: [fra589/grbl-Mega-5X#343](https://github.com/fra589/grbl-Mega-5X/issues/343)) 서보 전용 포크 [alnwlsn/grbl-Mega-5X-servos](https://github.com/alnwlsn/grbl-Mega-5X-servos)를 올리고 `pen_up_cmd = "M96 A400"` 처럼 두 줄만 바꾸면 됩니다.
 - 변환된 G-code 끝에 `M5`를 넣지 않습니다. `M5`는 듀티 0이라 펜이 한쪽 끝으로 튈 수 있습니다.
 

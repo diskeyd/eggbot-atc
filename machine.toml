@@ -5,7 +5,7 @@
 
 [machine]
 motor_steps = 200          # NEMA 17, 1.8 deg/step
-microsteps = 32            # TMC2209
+microsteps = 32            # DRV8825, all three RAMPS jumpers (M0 M1 M2) = 1/32
 x_gear_ratio = 1           # pen arm directly on the motor shaft = 1 (X counts degrees)
 y_gear_ratio = 1           # egg spindle directly on the motor = 1
 z_gear_ratio = 1           # magazine directly on the motor = 1

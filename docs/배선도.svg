@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" font-family="sans-serif" font-size="14">
+  <rect width="960" height="640" fill="#ffffff"/>
+  <defs>
+    <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6"><circle cx="5" cy="5" r="4" fill="#333"/></marker>
+  </defs>
+
+  <!-- power -->
+  <rect x="20" y="40" width="150" height="60" rx="6" fill="#eee" stroke="#333"/>
+  <text x="95" y="66" text-anchor="middle" font-weight="bold">12 V 10 A 어댑터</text>
+  <text x="95" y="86" text-anchor="middle">DC 잭 (5.5/2.1)</text>
+
+  <!-- DC-DC -->
+  <rect x="20" y="430" width="150" height="70" rx="6" fill="#dbe9ff" stroke="#333"/>
+  <text x="95" y="458" text-anchor="middle" font-weight="bold">DC-DC 5 V 5 A</text>
+  <text x="95" y="480" text-anchor="middle">출력 5.0 V 확인</text>
+
+  <!-- servo -->
+  <rect x="20" y="560" width="150" height="56" rx="6" fill="#dbe9ff" stroke="#333"/>
+  <text x="95" y="584" text-anchor="middle" font-weight="bold">MG90S 서보</text>
+  <text x="95" y="604" text-anchor="middle">펜 올림/내림</text>
+
+  <!-- RAMPS -->
+  <rect x="300" y="30" width="400" height="560" rx="8" fill="#fde2e2" stroke="#333" stroke-width="2"/>
+  <text x="500" y="56" text-anchor="middle" font-weight="bold" font-size="16">RAMPS 1.4 (Arduino Mega 2560 위에)</text>
+  <text x="500" y="76" text-anchor="middle" font-size="12">USB → PC (UGS)</text>
+
+  <rect x="306" y="96" width="156" height="64" fill="#fff" stroke="#333"/>
+  <text x="384" y="116" text-anchor="middle" font-weight="bold">전원 단자</text>
+  <text x="384" y="136" text-anchor="middle">5A 쌍 (필수)</text>
+  <text x="384" y="153" text-anchor="middle">11A 쌍 (같이 연결 OK)</text>
+
+  <rect x="306" y="420" width="156" height="90" fill="#fff" stroke="#333"/>
+  <text x="384" y="440" text-anchor="middle" font-weight="bold">서보 헤더</text>
+  <text x="384" y="460" text-anchor="middle">Servo 2 = D6</text>
+  <text x="384" y="478" text-anchor="middle">신호 + GND만</text>
+  <text x="384" y="496" text-anchor="middle" font-size="12">(+5 V 핀 안 씀)</text>
+
+  <rect x="306" y="530" width="156" height="50" fill="#fff" stroke="#c00"/>
+  <text x="384" y="552" text-anchor="middle" fill="#c00" font-weight="bold">D8 / D9 / D10</text>
+  <text x="384" y="570" text-anchor="middle" fill="#c00">12 V 출력 — 쓰지 않음</text>
+
+  <!-- driver sockets -->
+  <g font-size="13">
+    <rect x="470" y="96" width="220" height="70" fill="#ece4ff" stroke="#333"/>
+    <text x="480" y="118" font-weight="bold">X 소켓 · DRV8825</text>
+    <text x="480" y="138">축 X</text><text x="480" y="156">점퍼 3개 (1/32)</text>
+
+    <rect x="470" y="176" width="220" height="70" fill="#ece4ff" stroke="#333"/>
+    <text x="480" y="198" font-weight="bold">Y 소켓 · DRV8825</text>
+    <text x="480" y="218">축 Y</text><text x="480" y="236">점퍼 3개 (1/32)</text>
+
+    <rect x="470" y="256" width="220" height="70" fill="#ece4ff" stroke="#333"/>
+    <text x="480" y="278" font-weight="bold">Z 소켓 · DRV8825</text>
+    <text x="480" y="298">축 Z</text><text x="480" y="316">점퍼 3개 (1/32)</text>
+
+    <rect x="470" y="336" width="220" height="70" fill="#ece4ff" stroke="#333"/>
+    <text x="480" y="358" font-weight="bold">E0 소켓 · DRV8825</text>
+    <text x="480" y="378">축 A</text><text x="480" y="396">점퍼 3개 (1/32)</text>
+
+    <rect x="470" y="416" width="220" height="70" fill="#ece4ff" stroke="#333" stroke-dasharray="6 3"/>
+    <text x="480" y="438" font-weight="bold">E1 소켓 · DRV8825 (추가 구매)</text>
+    <text x="480" y="458">축 5 = Y 복제 (AXIS_5_NAME 'Y')</text><text x="480" y="476">점퍼 3개 (1/32)</text>
+  </g>
+
+  <!-- motors -->
+  <g font-size="13">
+    <rect x="790" y="104" width="150" height="54" rx="6" fill="#e8f5e9" stroke="#333"/>
+    <text x="865" y="126" text-anchor="middle" font-weight="bold">모터 1</text><text x="865" y="146" text-anchor="middle">펜 암 회전</text>
+    <rect x="790" y="184" width="150" height="54" rx="6" fill="#e8f5e9" stroke="#333"/>
+    <text x="865" y="206" text-anchor="middle" font-weight="bold">모터 2</text><text x="865" y="226" text-anchor="middle">계란 (모터 쪽)</text>
+    <rect x="790" y="264" width="150" height="54" rx="6" fill="#e8f5e9" stroke="#333"/>
+    <text x="865" y="286" text-anchor="middle" font-weight="bold">모터 3</text><text x="865" y="306" text-anchor="middle">매거진 회전</text>
+    <rect x="790" y="344" width="150" height="54" rx="6" fill="#e8f5e9" stroke="#333"/>
+    <text x="865" y="366" text-anchor="middle" font-weight="bold">모터 4</text><text x="865" y="386" text-anchor="middle">ATC 슬라이드</text>
+    <rect x="790" y="424" width="150" height="54" rx="6" fill="#e8f5e9" stroke="#333" stroke-dasharray="6 3"/>
+    <text x="865" y="446" text-anchor="middle" font-weight="bold">모터 5 (추가 구매)</text><text x="865" y="466" text-anchor="middle">계란 (반대쪽)</text>
+  </g>
+  <g stroke="#2e7d32" stroke-width="3">
+    <line x1="690" y1="131" x2="790" y2="131"/>
+    <line x1="690" y1="211" x2="790" y2="211"/>
+    <line x1="690" y1="291" x2="790" y2="291"/>
+    <line x1="690" y1="371" x2="790" y2="371"/>
+    <line x1="690" y1="451" x2="790" y2="451" stroke-dasharray="8 4"/>
+  </g>
+  <text x="865" y="500" text-anchor="middle" font-size="12">4선 케이블 → 소켓 옆 4핀</text>
+
+  <!-- 12V wires -->
+  <g stroke-width="3" fill="none">
+    <polyline points="170,62 306,120" stroke="#d32f2f"/>
+    <polyline points="170,82 306,140" stroke="#222"/>
+    <polyline points="60,100 60,430" stroke="#d32f2f"/>
+    <polyline points="80,100 80,430" stroke="#222"/>
+  </g>
+  <text x="200" y="74" font-size="12" fill="#d32f2f">+12 V</text>
+  <text x="200" y="128" font-size="12">GND</text>
+  <text x="90" y="270" font-size="12">12 V 입력 (병렬)</text>
+
+  <!-- 5V to servo -->
+  <g stroke-width="3" fill="none">
+    <line x1="60" y1="500" x2="60" y2="560" stroke="#d32f2f"/>
+    <line x1="80" y1="500" x2="80" y2="560" stroke="#222"/>
+    <polyline points="170,590 240,590 240,455 306,455" stroke="#f9a825"/>
+    <polyline points="170,605 260,605 260,485 306,485" stroke="#222"/>
+  </g>
+  <text x="90" y="536" font-size="12">+5 V / GND</text>
+  <text x="180" y="582" font-size="12" fill="#b28704">신호 (노랑)</text>
+  <text x="180" y="625" font-size="12">GND 공통</text>
+</svg>
