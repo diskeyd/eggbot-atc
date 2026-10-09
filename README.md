@@ -148,7 +148,7 @@ G0 X.. Y..          ; 그리던 곳으로 복귀 후 펜 내림
 ## 서보(펜 승하강) 주의
 
 - grbl-Mega-5X 기본 펌웨어에는 서보 명령이 없어 **스핀들 PWM(`M3 S…`)** 으로 대신합니다. `S`는 각도가 아니라 0~`$30`(=255) 범위의 듀티 값입니다. `M3 S90`/`M3 S30`은 출발점일 뿐, 실제 올라감/내려감 값은 튜닝해서 `pen_up_cmd`/`pen_down_cmd`에 넣습니다.
-- **RAMPS의 기본 스핀들 PWM 핀 D8은 12 V MOSFET 출력입니다. 서보 신호선을 절대 연결하지 마세요.** 펌웨어 `config.h`에서 `SPINDLE_PWM_ON_D6`(RAMPS 서보 헤더의 D6, 5 V 로직)로 옮긴 뒤 그 핀에 연결합니다. `config.h`에서 고를 수 있는 핀은 D8(기본)과 D6뿐입니다. D9는 쿨런트(미스트) 출력이자 RAMPS의 12 V MOSFET이라 쓸 수 없습니다. 서보 전원은 Mega 5 V가 아니라 5 V DC-DC에서 받습니다 ([배선도](docs/배선도.md) 2장).
+- **RAMPS의 기본 스핀들 PWM 핀 D8은 12 V MOSFET 출력입니다. 서보 신호선을 절대 연결하지 마세요.** 펌웨어 `config.h`에서 `SPINDLE_PWM_ON_D6`(RAMPS 서보 헤더의 D6, 5 V 로직)로 옮긴 뒤 그 핀에 연결합니다. 이렇게 빌드한 파일이 [`firmware/grbl-mega-5x-d6.hex`](firmware/README.md)입니다. `config.h`에서 고를 수 있는 핀은 D8(기본)과 D6뿐입니다. D9는 쿨런트(미스트) 출력이자 RAMPS의 12 V MOSFET이라 쓸 수 없습니다. 서보 전원은 Mega 5 V가 아니라 5 V DC-DC에서 받습니다 ([배선도](docs/배선도.md) 2장).
 - MG90S가 PWM으로 안 움직이면(관련 이슈: [fra589/grbl-Mega-5X#343](https://github.com/fra589/grbl-Mega-5X/issues/343)) 서보 전용 포크 [alnwlsn/grbl-Mega-5X-servos](https://github.com/alnwlsn/grbl-Mega-5X-servos)를 올리고 `pen_up_cmd = "M96 A400"` 처럼 두 줄만 바꾸면 됩니다.
 - 변환된 G-code 끝에 `M5`를 넣지 않습니다. `M5`는 듀티 0이라 펜이 한쪽 끝으로 튈 수 있습니다.
 
