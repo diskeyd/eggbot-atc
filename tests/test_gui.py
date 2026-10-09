@@ -71,3 +71,20 @@ def test_window_blocks_save_until_measured(app, monkeypatch):
     monkeypatch.setattr(gui.filedialog, "asksaveasfilename", lambda **k: saved.append(1) or "x.gcode")
     app.save_file()
     assert not saved and app.shown[-1][0] == "showerror"
+
+
+@pytest.mark.parametrize("name, body", [
+    ("cnc.ngc", "%\nG21\n(Start cutting path id: path2)\nG00 Z5\nG00 X0 Y0\nG01 Z-1 F100\nG01 X100 Y0 Z-1\n"
+                "G02 X100 Y200 Z-1 I0 J100\nG00 Z5\n(Start cutting path id: path4)\nG00 X50 Y50\nG01 Z-1\n"
+                "G01 X60 Y60 Z-1\nG00 Z5\nM5\nM2\n%\n"),
+    ("ready.gcode", "G21\nG90\nT1\nG0 X5 Y10\nM3 S30\nG1 X10 Y20 F1500\nM3 S90\nT2\nG0 X20 Y30\nM3 S30\nG1 X25 Y40\nM3 S90\nM2\n"),
+])
+def test_window_opens_gcode(app, monkeypatch, tmp_path, name, body):
+    path = tmp_path / name
+    path.write_text(body, encoding="utf-8")
+    monkeypatch.setattr(gui.filedialog, "askopenfilename", lambda **k: str(path))
+    app.load_file_dialog()
+    assert len(app.layer_combos) == 2 and app.gcode_lines
+    app.apply_atc_conversion()
+    assert sum(l.startswith("; ATC T") for l in app.gcode_lines) == 3
+    assert not any(e[0] == "showerror" for e in app.shown)

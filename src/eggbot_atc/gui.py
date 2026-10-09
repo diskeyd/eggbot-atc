@@ -755,8 +755,22 @@ class UltimateATCGCodeApp:
         self.root.after(1000, lambda: self.canvas_preview.delete(self.atc_effect_text) if self.atc_effect_text else None)
 
 
+def report_error(exc, val, tb):
+    """A windowed exe has no console: show callback errors and keep them in error.log next to the exe."""
+    import traceback
+
+    text = "".join(traceback.format_exception(exc, val, tb))
+    try:
+        with open(app_dir() / "error.log", "a", encoding="utf-8") as f:
+            f.write(text + "\n")
+    except OSError:
+        pass
+    messagebox.showerror("오류", f"{val}\n\n자세한 내용: {app_dir() / 'error.log'}\n\n{text[-1500:]}")
+
+
 def main():
     root = tk.Tk()
+    root.report_callback_exception = report_error
     UltimateATCGCodeApp(root)
     root.mainloop()
 
