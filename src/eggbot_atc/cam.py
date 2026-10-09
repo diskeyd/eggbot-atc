@@ -8,7 +8,8 @@ short lines, and the drawing's bounding box is scaled onto svg_width_deg x 360 l
 import math
 import re
 
-from .config import get, require
+from .config import get
+from .svg2gcode import drawing_area, plain
 
 _WORD = re.compile(r"([GXYZIJ])\s*(-?\d*\.?\d+)", re.IGNORECASE)
 _PATH_ID = re.compile(r"\(Start cutting path id:\s*(.*?)\)", re.IGNORECASE)
@@ -98,8 +99,6 @@ def _groups(lines):
 
 def machine_lines(lines, cfg):
     """G-code this machine can run as drawing input: CNC files are re-drawn, others pass through."""
-    from .svg2gcode import plain
-
     return plain(cfg, load_blocks(lines, cfg)) if uses_z_for_pen(lines) else lines
 
 
@@ -110,10 +109,7 @@ def load_blocks(lines, cfg):
     if not pts:
         raise ValueError("no pen-down moves found (expected Z below 0 to draw)")
     xs, ys = [p[0] for p in pts], [p[1] for p in pts]
-    width = float(require(cfg, "drawing.svg_width_deg"))
-    x0 = float(require(cfg, "drawing.x_offset_deg"))
-    if x0 < 0 or x0 + width > float(require(cfg, "machine.x_max_deg")):
-        raise ValueError("x_offset_deg + svg_width_deg must fit inside 0..x_max_deg")
+    x0, width = drawing_area(cfg)
     # ponytail: bounding box fills the whole egg (Y span -> 360 deg); use SVG input for exact placement
     sx = width / ((max(xs) - min(xs)) or 1.0)
     sy = 360.0 / ((max(ys) - min(ys)) or 1.0)

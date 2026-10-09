@@ -7,13 +7,14 @@ import re
 import shutil
 import sys
 import tkinter as tk
+import tomllib
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
 from . import config
 from .atc import _TOOL, insert_tool_changes
 from .cam import machine_lines, uses_z_for_pen
-from .svg2gcode import load_layers, plain
+from .svg2gcode import drawing_area, load_layers, plain
 
 # Settings window rows: (label, machine.toml key). Order follows docs/측정-체크리스트.md.
 SETTINGS = [
@@ -96,7 +97,23 @@ def preview_cfg(cfg):
     for key in todo:
         section, name = key.split(".")
         cfg.setdefault(section, {})[name] = PREVIEW_FALLBACK[key]
+    # A stand-in width must not overflow a measured arm swing: shrink it to what is left.
+    d, m = cfg["drawing"], cfg["machine"]
+    if "drawing.svg_width_deg" in todo and d["x_offset_deg"] + d["svg_width_deg"] > m["x_max_deg"]:
+        d["svg_width_deg"] = max(float(m["x_max_deg"]) - float(d["x_offset_deg"]), 1.0)
     return cfg, todo
+
+
+def area_problem(cfg):
+    """Korean explanation when the drawing area does not fit the arm swing, else None."""
+    try:
+        drawing_area(cfg)
+    except ValueError:
+        g = lambda k: config.get(cfg, k)
+        return (f"그림 왼쪽 끝 X ({g('drawing.x_offset_deg')}) + 그림 가로 폭 X ({g('drawing.svg_width_deg')})"
+                f" 가 펜 암 최대 각도 X ({g('machine.x_max_deg')}) 보다 큽니다.\n"
+                "[⚙️ 기계 물리 설정]에서 셋 중 하나를 고쳐 주세요.\n(왼쪽 끝 + 가로 폭 ≤ 최대 각도, 가로 폭 > 0)")
+    return None
 
 
 def map_tools(lines, change_points, tools):
@@ -160,6 +177,9 @@ class UltimateATCGCodeApp:
         # SVG and CNC G-code (pen on Z, e.g. Inkscape gcodetools) are re-drawn in this machine's
         # degrees with one T line per layer / object; machine-ready G-code is kept as is.
         cfg, _ = preview_cfg(self.cfg)
+        if area_problem(cfg):
+            messagebox.showerror("기계 설정 확인", area_problem(cfg))
+            return
         try:
             if filepath.lower().endswith(".svg"):
                 lines = plain(cfg, load_layers(filepath, cfg))
@@ -356,6 +376,11 @@ class UltimateATCGCodeApp:
                     text = set_toml_value(text, key, parse_value(entry.get()))
             except KeyError as k:
                 messagebox.showerror("입력 오류", f"machine.toml에 {k} 항목이 없습니다.", parent=popup)
+                return
+            new_cfg = tomllib.loads(text)
+            problem = area_problem(preview_cfg(new_cfg)[0])
+            if problem:
+                messagebox.showerror("입력 오류", problem, parent=popup)
                 return
             self.cfg_path.write_text(text, encoding="utf-8")
             self.cfg = config.load(self.cfg_path)

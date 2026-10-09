@@ -88,3 +88,18 @@ def test_window_opens_gcode(app, monkeypatch, tmp_path, name, body):
     app.apply_atc_conversion()
     assert sum(l.startswith("; ATC T") for l in app.gcode_lines) == 3
     assert not any(e[0] == "showerror" for e in app.shown)
+
+
+def test_measured_arm_swing_shrinks_the_stand_in_width():
+    cfg = config.load(ROOT / "machine.toml")
+    cfg["machine"]["x_max_deg"] = 40  # measured, smaller than the stand-in width 60
+    filled, _ = gui.preview_cfg(cfg)
+    assert filled["drawing"]["svg_width_deg"] == 40 and gui.area_problem(filled) is None
+
+
+def test_measured_values_that_do_not_fit_are_explained(app, monkeypatch):
+    app.cfg["drawing"]["x_offset_deg"] = 30  # 30 + 60 > 80
+    monkeypatch.setattr(gui.filedialog, "askopenfilename", lambda **k: str(HERE / "sample.svg"))
+    app.load_file_dialog()
+    assert app.shown[-1][0] == "showerror" and "최대 각도" in app.shown[-1][1][1]
+    assert not app.gcode_lines

@@ -38,13 +38,22 @@ def _flatten(group, step_px):
             yield cur
 
 
+def drawing_area(cfg):
+    """(x_offset_deg, svg_width_deg), checked to fit inside the pen arm's 0..x_max_deg swing."""
+    width = float(require(cfg, "drawing.svg_width_deg"))
+    x0 = float(require(cfg, "drawing.x_offset_deg"))
+    x_max = float(require(cfg, "machine.x_max_deg"))
+    if x0 < 0 or width <= 0 or x0 + width > x_max:
+        raise ValueError(
+            f"x_offset_deg ({x0:g}) + svg_width_deg ({width:g}) = {x0 + width:g} must fit inside 0..x_max_deg ({x_max:g})"
+        )
+    return x0, width
+
+
 def load_layers(svg_path, cfg):
     """Return [(tool_no, [polyline_in_machine_units, ...]), ...] in drawing order."""
     svg = SVG.parse(svg_path, reify=True)
-    width = float(require(cfg, "drawing.svg_width_deg"))
-    x0 = float(require(cfg, "drawing.x_offset_deg"))
-    if x0 < 0 or x0 + width > float(require(cfg, "machine.x_max_deg")):
-        raise ValueError("x_offset_deg + svg_width_deg must fit inside 0..x_max_deg")
+    x0, width = drawing_area(cfg)
     sx = width / svg.width
     sy = 360.0 / svg.height
     invert = bool(get(cfg, "drawing.y_invert", False))
