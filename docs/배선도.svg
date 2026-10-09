@@ -57,9 +57,9 @@
     <text x="480" y="358" font-weight="bold">E0 소켓 · DRV8825</text>
     <text x="480" y="378">축 A</text><text x="480" y="396">점퍼 3개 (1/32)</text>
 
-    <rect x="470" y="416" width="220" height="70" fill="#ece4ff" stroke="#333" stroke-dasharray="6 3"/>
-    <text x="480" y="438" font-weight="bold">E1 소켓 · DRV8825 (추가 구매)</text>
-    <text x="480" y="458">축 5 = Y 복제 (AXIS_5_NAME 'Y')</text><text x="480" y="476">점퍼 3개 (1/32)</text>
+    <rect x="470" y="416" width="220" height="70" fill="#f5f5f5" stroke="#999" stroke-dasharray="6 3"/>
+    <text x="480" y="438" font-weight="bold" fill="#777">E1 소켓 · 비움</text>
+    <text x="480" y="458" fill="#777">드라이버 안 꽂음</text>
   </g>
 
   <!-- motors -->
@@ -72,17 +72,14 @@
     <text x="865" y="286" text-anchor="middle" font-weight="bold">모터 3</text><text x="865" y="306" text-anchor="middle">매거진 회전</text>
     <rect x="790" y="344" width="150" height="54" rx="6" fill="#e8f5e9" stroke="#333"/>
     <text x="865" y="366" text-anchor="middle" font-weight="bold">모터 4</text><text x="865" y="386" text-anchor="middle">ATC 슬라이드</text>
-    <rect x="790" y="424" width="150" height="54" rx="6" fill="#e8f5e9" stroke="#333" stroke-dasharray="6 3"/>
-    <text x="865" y="446" text-anchor="middle" font-weight="bold">모터 5 (추가 구매)</text><text x="865" y="466" text-anchor="middle">계란 (반대쪽)</text>
   </g>
   <g stroke="#2e7d32" stroke-width="3">
     <line x1="690" y1="131" x2="790" y2="131"/>
     <line x1="690" y1="211" x2="790" y2="211"/>
     <line x1="690" y1="291" x2="790" y2="291"/>
     <line x1="690" y1="371" x2="790" y2="371"/>
-    <line x1="690" y1="451" x2="790" y2="451" stroke-dasharray="8 4"/>
   </g>
-  <text x="865" y="500" text-anchor="middle" font-size="12">4선 케이블 → 소켓 옆 4핀</text>
+  <text x="865" y="420" text-anchor="middle" font-size="12">4선 케이블 → 소켓 옆 4핀</text>
 
   <!-- 12V wires -->
   <g stroke-width="3" fill="none">

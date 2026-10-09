@@ -18,7 +18,7 @@ eggbot-atc convert 그림.svg -o 출력.gcode      ← 이 저장소
 Universal Gcode Sender (UGS)                    ← 파일 열고 ▶ 누르면 됨
    │  USB 시리얼
    ▼
-Arduino Mega 2560 + RAMPS 1.4 + grbl-Mega-5X    ← 모터 5축 구동
+Arduino Mega 2560 + RAMPS 1.4 + grbl-Mega-5X    ← 스텝모터 4축 + 서보 구동
 ```
 
 축 배정 (설정 파일 기준, 바꿀 수 있음):
@@ -29,7 +29,6 @@ Arduino Mega 2560 + RAMPS 1.4 + grbl-Mega-5X    ← 모터 5축 구동
 | Y | 계란 회전 | 도(°) |
 | Z | 매거진(펜 보관통) 회전 | 도(°) |
 | A | ATC 슬라이드 이송 (T8 리드스크루, Ø8 샤프트 2개) | mm |
-| (5번 축) | 계란 반대쪽 모터. 펌웨어에서 Y로 복제해 Y와 똑같이 돎 | 도(°) |
 | 서보 | 펜 올리기/내리기 | `M3 S…` PWM |
 
 ## 설치

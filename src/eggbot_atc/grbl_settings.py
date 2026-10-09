@@ -9,17 +9,14 @@ _RUNTIME = [
     ("$111", "y_max_rate", "Y max rate deg/min"),
     ("$112", "z_max_rate", "Z (magazine) max rate deg/min"),
     ("$113", "a_max_rate", "A (slide) max rate mm/min"),
-    ("$114", "y_max_rate", "axis 5 = second egg motor, same as Y"),
     ("$120", "x_accel", "X accel deg/s^2"),
     ("$121", "y_accel", "Y accel deg/s^2"),
     ("$122", "z_accel", "Z accel deg/s^2"),
     ("$123", "a_accel", "A accel mm/s^2"),
-    ("$124", "y_accel", "axis 5 = second egg motor, same as Y"),
     ("$130", "x_max_travel", "X max travel deg (= machine.x_max_deg)"),
     ("$131", "y_max_travel", "Y max travel deg (>= 360)"),
     ("$132", "z_max_travel", "Z max travel deg (must cover slot0 + 240 + twist_deg)"),
     ("$133", "a_max_travel", "A max travel mm"),
-    ("$134", "y_max_travel", "axis 5 = second egg motor, same as Y"),
 ]
 
 
@@ -42,8 +39,6 @@ def settings(cfg):
         _row("$101", spr * float(m.get("y_gear_ratio", 1)) / 360.0, "Y steps/deg (1 unit = 1 deg of egg)"),
         _row("$102", spr * float(m.get("z_gear_ratio", 1)) / 360.0, "Z steps/deg (magazine)"),
         _row("$103", a_steps, "A steps/mm = motor_steps*microsteps/a_lead_mm"),
-        # Second egg motor on the E1 socket: firmware built with AXIS_5_NAME 'Y' clones Y onto it.
-        _row("$104", spr * float(m.get("y_gear_ratio", 1)) / 360.0, "axis 5 steps/deg = second egg motor, same as Y"),
     ]
     g = cfg.get("grbl", {})
     overrides = {"x_max_travel": m.get("x_max_deg")}
@@ -53,6 +48,5 @@ def settings(cfg):
         "$30=255  ; max S value (pen_up_cmd / pen_down_cmd use this range)",
         "$31=0  ; min S value",
         "$32=0  ; laser mode off",
-        "; $3: if the two egg motors fight each other on the first run, add 16 (inverts axis 5)",
     ]
     return lines
