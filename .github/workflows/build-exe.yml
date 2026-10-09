@@ -1,0 +1,21 @@
+name: build-exe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["src/**", "machine.toml", "packaging/**", "pyproject.toml", "uv.lock", ".github/workflows/build-exe.yml"]
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync
+      - run: uv run pytest -q
+      - run: uv run --with pyinstaller pyinstaller --onefile --windowed --name EggBot-ATC --add-data "machine.toml;." packaging/eggbot-atc-gui.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EggBot-ATC-windows
+          path: dist/EggBot-ATC.exe

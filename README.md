@@ -69,6 +69,11 @@ uv run eggbot-atc --config tests/machine_test.toml convert tests/sample.svg -o o
 
 `tests/machine_test.toml`의 숫자는 **측정값이 아니라** 테스트용 자리표시자입니다.
 
+## 윈도우 프로그램 (exe)
+
+명령어 대신 창으로 쓰려면 `EggBot-ATC.exe`를 받으세요: GitHub **Actions** → `build-exe` → 최근 실행 → Artifacts `EggBot-ATC-windows`.
+파일 열기(SVG/G-code) → 기계 설정 → 변환 → 미리보기·재생 → 저장. 팀원 프로그램에서 고친 점은 [docs/변환프로그램-비교.md](docs/변환프로그램-비교.md) 8장.
+
 ## 그림 그리는 규칙 (Inkscape)
 
 - **색 하나 = 레이어 하나.** 레이어 이름에 펜 번호를 넣습니다: `T1 빨강`, `T2 파랑`, `T3 초록`. `T` 번호가 없으면 레이어 순서대로 1, 2, 3이 됩니다.
