@@ -12,6 +12,7 @@ from tkinter import filedialog, messagebox, ttk
 
 from . import config
 from .atc import _TOOL, insert_tool_changes
+from .cam import machine_lines, uses_z_for_pen
 from .svg2gcode import load_layers, plain
 
 # Settings window rows: (label, machine.toml key). Order follows docs/측정-체크리스트.md.
@@ -151,16 +152,23 @@ class UltimateATCGCodeApp:
         self.create_main_ui()
 
     def load_file_dialog(self):
-        filepath = filedialog.askopenfilename(title="G-code / SVG 파일 선택", filetypes=[("G-code / SVG Files", "*.gcode *.nc *.txt *.svg"), ("All Files", "*.*")])
+        filepath = filedialog.askopenfilename(title="G-code / SVG 파일 선택", filetypes=[("G-code / SVG Files", "*.gcode *.nc *.ngc *.txt *.svg"), ("All Files", "*.*")])
         if not filepath: return
+        self.load_path(filepath)
 
+    def load_path(self, filepath):
+        # SVG and CNC G-code (pen on Z, e.g. Inkscape gcodetools) are re-drawn in this machine's
+        # degrees with one T line per layer / object; machine-ready G-code is kept as is.
+        cfg, _ = preview_cfg(self.cfg)
         try:
             if filepath.lower().endswith(".svg"):
-                cfg, _ = preview_cfg(self.cfg)
                 lines = plain(cfg, load_layers(filepath, cfg))
             else:
                 with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
-                    lines = f.read().splitlines()
+                    raw = f.read().splitlines()
+                if uses_z_for_pen(raw):
+                    messagebox.showinfo("CNC G-code 변환", "Z로 펜을 올리고 내리는 CNC G-code입니다.\n에그봇 좌표(도)로 다시 그리고, Z는 서보 명령으로 바꿉니다.\n그림 크기는 [그림 가로 폭]과 계란 한 바퀴(360°)에 맞춥니다.\n\n객체(path id)마다 레이어 하나로 나눕니다.")
+                lines = machine_lines(raw, cfg)
         except (ValueError, config.MeasurementNeeded) as e:
             messagebox.showerror("파일 열기 실패", str(e))
             return
@@ -355,6 +363,7 @@ class UltimateATCGCodeApp:
             note = "모든 값을 쟀습니다." if not todo else f"아직 안 잰 값: {len(todo)}개 (미리보기만 가능)"
             messagebox.showinfo("저장 완료", f"machine.toml에 저장했습니다.\n{note}", parent=popup)
             popup.destroy()
+            if self.input_filepath: self.load_path(self.input_filepath)  # redraw with the new values
 
         btn_save = tk.Button(popup, text="💾 설정 저장 및 닫기", bg="#10B981", fg="white", font=("맑은 고딕", 10, "bold"), relief="flat", cursor="hand2", command=save_settings, pady=10)
         btn_save.pack(fill="x", padx=20, pady=(15, 20))

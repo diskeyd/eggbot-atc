@@ -4,6 +4,7 @@ from pathlib import Path
 
 from . import config
 from .atc import insert_tool_changes
+from .cam import machine_lines
 from .grbl_settings import settings
 from .svg2gcode import convert
 
@@ -39,7 +40,7 @@ def main(argv=None):
         if src.suffix.lower() == ".svg":
             lines = convert(src, cfg)
         else:
-            lines = insert_tool_changes(cfg, src.read_text().splitlines())
+            lines = insert_tool_changes(cfg, machine_lines(src.read_text().splitlines(), cfg))
         Path(args.output).write_text("\n".join(lines) + "\n")
         print(f"wrote {args.output} ({len(lines)} lines)")
         return 0

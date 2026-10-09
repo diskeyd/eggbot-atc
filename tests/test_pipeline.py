@@ -148,3 +148,45 @@ def test_plain_svg_gcode_matches_direct_convert(cfg):
         return [[l for l in b if not re.match(r"G0 X[-\d.]+ Y", l)] for b in blocks]
 
     assert macro_only(atc_blocks(via_t_lines)) == macro_only(atc_blocks(direct))
+
+
+# Inkscape gcodetools style: pen on Z, document units, arcs, one path id per object.
+CNC = """%
+M3
+G21 (All units in mm)
+(Start cutting path id: path2)
+G00 Z5.000000
+G00 X0 Y0
+G01 Z-1.000000 F100.0(Penetrate)
+G01 X100 Y0 Z-1.000000 F400
+G02 X100 Y200 Z-1.000000 I0 J100
+G00 Z5.000000
+(End cutting path id: path2)
+(Start cutting path id: path4)
+G00 Z5.000000
+G00 X50 Y50
+G01 Z-1.000000
+G01 X60 Y60 Z-1.000000
+G00 Z5.000000
+(End cutting path id: path4)
+M5
+G00 X0.0000 Y0.0000
+M2
+%""".splitlines()
+
+
+def test_cnc_gcode_is_redrawn_in_machine_degrees(cfg):
+    from eggbot_atc.cam import load_blocks, machine_lines, uses_z_for_pen
+
+    assert uses_z_for_pen(CNC)
+    blocks = load_blocks(CNC, cfg)
+    assert [t for t, _ in blocks] == [1, 2]  # one layer per object, pens 1, 2
+    pts = [p for _, pls in blocks for pl in pls for p in pl]
+    assert min(p[0] for p in pts) == 0 and round(max(p[0] for p in pts), 6) == 60  # svg_width_deg
+    assert round(min(p[1] for p in pts), 6) == 0 and round(max(p[1] for p in pts), 6) == 360
+    assert len(blocks[0][1][0]) > 10  # the G02 arc became short lines
+    out = insert_tool_changes(cfg, machine_lines(CNC, cfg))
+    drawing = [l for b in out for l in [b]]
+    i, j = out.index("; ATC T0 -> T1"), out.index("; ATC T2 -> T0")
+    assert not any("Z" in l for l in out[i:j] if not l.startswith(("; ATC", "G1 Z")))  # Z never draws
+    assert "M3 S30" in drawing and "M5" not in drawing
