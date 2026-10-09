@@ -7,7 +7,7 @@
 | 원본 | [fra589/grbl-Mega-5X](https://github.com/fra589/grbl-Mega-5X) `edge` 브랜치, 커밋 `baaa1be` |
 | 바꾼 것 | `grbl/config.h`: `SPINDLE_PWM_ON_D8` 끄고 `SPINDLE_PWM_ON_D6` 켬 (서보 신호를 RAMPS 서보 헤더 D6으로) |
 | 그대로 둔 것 | `N_AXIS 5` (E1 소켓은 비어 있어서 5번 축은 안 움직임), 나머지 전부 기본값 |
-| 라이선스 | GPLv3 (원본과 같음). 소스는 위 원본 + 아래 두 줄 변경 |
+| 라이선스 | GPLv3 (원본과 같음). 소스 = 위 원본 + "바꾼 것"의 두 줄 |
 | 빌드 | arduino-cli, `arduino:avr:mega:cpu=atmega2560` (2026-10-09) |
 
 ## 올리는 법 (Windows)
