@@ -21,31 +21,39 @@ def slot_deg(cfg, tool):
 
 
 def tool_change(cfg, old, new, resume_xy=None):
-    """G-code lines that swap pen `old` for pen `new`; 0 means no pen (start or end of job)."""
+    """G-code lines that swap pen `old` for pen `new`; 0 means no pen (start or end of job).
+
+    Twist method: the magazine turns `twist_deg` off a slot so the fork clears the pen,
+    then turns back onto the slot angle so the fork closes around the pen holder.
+    """
     a = lambda k: fmt(require(cfg, "atc." + k))
     f = f" F{fmt(get(cfg, 'atc.atc_feed', 600))}"
     dwell = fmt(get(cfg, "drawing.pen_dwell_ms", 300) / 1000)
+    twist = float(require(cfg, "atc.twist_deg"))
     lines = [
         f"; ATC T{old} -> T{new}",
         require(cfg, "drawing.pen_up_cmd"),
         f"G4 P{dwell}",
         f"G0 X{a('park_x')}",
     ]
-    if old:  # return the current pen to its slot (Z is still at that slot's angle)
+    if old:  # return the current pen to its slot
+        z = slot_deg(cfg, old)
         lines += [
+            f"G1 Z{fmt(z + twist)}{f}",  # fork turned clear of the pen
             f"G1 A{a('slide_in_mm')}{f}",
-            f"G1 X{a('dock_x')}{f}",
-            f"G1 X{a('release_x')}{f}",
+            f"G1 Z{fmt(z)}{f}",  # fork closes on the pen holder
+            f"G1 X{a('release_x')}{f}",  # arm pulls off the magnets, pen stays in the fork
+            f"G1 A{a('slide_out_mm')}{f}",
         ]
         if new == 0:  # end of job: pen returned, nothing to pick up
-            lines += [f"G1 A{a('slide_out_mm')}{f}", "; ATC end"]
+            lines.append("; ATC end")
             return lines
-        lines.append(f"G1 A{a('slide_index_mm')}{f}")
-    # With no pen the magazine angle is unknown, so index before the slide moves in.
+        lines.append(f"G0 X{a('park_x')}")
+    z = slot_deg(cfg, new)
     lines += [
-        f"G1 Z{fmt(slot_deg(cfg, new))}{f}",
-        f"G1 A{a('slide_in_mm')}{f}",
-        f"G1 X{a('dock_x')}{f}",
+        f"G1 Z{fmt(z)}{f}",  # fork holding the new pen faces the arm (slide still out)
+        f"G1 A{a('slide_in_mm')}{f}",  # pen holder seats on the arm magnets
+        f"G1 Z{fmt(z + twist)}{f}",  # fork opens, pen stays on the arm
         f"G1 A{a('slide_out_mm')}{f}",
     ]
     if resume_xy:

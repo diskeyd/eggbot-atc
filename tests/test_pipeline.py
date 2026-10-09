@@ -40,25 +40,31 @@ def test_three_layers_three_tool_changes(cfg):
 
 def test_job_ends_with_pen_returned(cfg):
     last = atc_blocks(convert(HERE / "sample.svg", cfg))[-1]
-    assert "G1 X70 F600" in last  # release_x: pen left in its slot
-    assert not any(l.startswith("G1 Z") for l in last)  # no indexing, nothing to pick up
-    assert last[-1] == "G1 A0 F600"  # slide fully out (helper strips "; ATC end")
+    # T3 sits at slot 3 = 10 + 240 deg; fork turns 45 deg off, slides in, closes, arm pulls off
+    assert last[3:] == ["G0 X75", "G1 Z295 F600", "G1 A20 F600", "G1 Z250 F600", "G1 X70 F600", "G1 A0 F600"]
 
 
-def test_first_change_indexes_before_slide_and_skips_release(cfg):
-    first, second = atc_blocks(convert(HERE / "sample.svg", cfg))[:2]
-    assert not any("X70" in l for l in first)  # release_x never used without a pen
-    z = next(i for i, l in enumerate(first) if l.startswith("G1 Z"))
-    a = next(i for i, l in enumerate(first) if l.startswith("G1 A"))
-    assert z < a
-    assert "G1 X70 F600" in second
-    assert "G4 P0.3" in first
+def test_first_pickup_indexes_before_slide_and_skips_return(cfg):
+    first = atc_blocks(convert(HERE / "sample.svg", cfg))[0]
+    assert first[1:3] == ["M3 S90", "G4 P0.3"]
+    assert first[3:8] == ["G0 X75", "G1 Z10 F600", "G1 A20 F600", "G1 Z55 F600", "G1 A0 F600"]
+    assert not any("X70" in l for l in first)  # release_x only when a pen is returned
 
 
-def test_slot_angles(cfg):
-    blocks = atc_blocks(convert(HERE / "sample.svg", cfg))
-    zs = [next(l for l in b if l.startswith("G1 Z")) for b in blocks[:3]]
-    assert zs == ["G1 Z10 F600", "G1 Z130 F600", "G1 Z250 F600"]
+def test_swap_returns_old_pen_then_picks_new(cfg):
+    second = atc_blocks(convert(HERE / "sample.svg", cfg))[1]
+    assert second[3:14] == [
+        "G0 X75",
+        "G1 Z55 F600", "G1 A20 F600", "G1 Z10 F600", "G1 X70 F600", "G1 A0 F600",  # T1 back to slot 1
+        "G0 X75",
+        "G1 Z130 F600", "G1 A20 F600", "G1 Z175 F600", "G1 A0 F600",  # T2 from slot 2
+    ]
+
+
+def test_twist_must_be_measured(cfg):
+    del cfg["atc"]["twist_deg"]
+    with pytest.raises(config.MeasurementNeeded):
+        tool_change(cfg, 1, 2)
 
 
 def test_resume_at_first_point_then_pen_down(cfg):

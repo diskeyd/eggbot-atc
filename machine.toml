@@ -27,13 +27,12 @@ home_cmd = "G92 X0 Y0 Z0 A0"   # manual zeroing; switch to "$H" once endstops ar
 [atc]
 slot_count = 3             # pens in the magazine
 initial_tool = 0           # 0 = no pen in the carriage at start
-park_x = "TODO"            # X where the carriage waits before the slide moves
-dock_x = "TODO"            # X where the pen is fully seated in the magazine slot / coupling
-release_x = "TODO"         # X where the carriage has pulled clear of the pen it left behind
-slide_in_mm = "TODO"       # A: magazine pushed against the carriage
-slide_index_mm = "TODO"    # A: backed off just enough for the magazine to rotate
+park_x = "TODO"            # X where the arm (pen on its magnets) meets the magazine fork
+release_x = "TODO"         # X where the arm has pulled off the pen left in the fork
+slide_in_mm = "TODO"       # A: magazine pushed against the arm
 slide_out_mm = "TODO"      # A: fully retracted (drawing position)
 slot0_deg = "TODO"         # Z angle of slot 1; slot n = slot0 + (n-1)*360/slot_count
+twist_deg = 45             # Z turn that swings a fork clear of its pen (team converter value). Verify.
 atc_feed = 600             # feed for all ATC moves
 
 [grbl]

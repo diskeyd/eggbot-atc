@@ -11,10 +11,8 @@ REQUIRED_FOR_CONVERT = [
     "drawing.x_offset_deg",
     "atc.slot0_deg",
     "atc.park_x",
-    "atc.dock_x",
     "atc.release_x",
     "atc.slide_in_mm",
-    "atc.slide_index_mm",
     "atc.slide_out_mm",
 ]
 

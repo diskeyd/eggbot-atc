@@ -17,7 +17,7 @@ _RUNTIME = [
     ("$124", "y_accel", "axis 5 = second egg motor, same as Y"),
     ("$130", "x_max_travel", "X max travel deg (= machine.x_max_deg)"),
     ("$131", "y_max_travel", "Y max travel deg (>= 360)"),
-    ("$132", "z_max_travel", "Z max travel deg (must cover slot0 + 360)"),
+    ("$132", "z_max_travel", "Z max travel deg (must cover slot0 + 240 + twist_deg)"),
     ("$133", "a_max_travel", "A max travel mm"),
     ("$134", "y_max_travel", "axis 5 = second egg motor, same as Y"),
 ]

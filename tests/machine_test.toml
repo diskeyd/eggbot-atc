@@ -24,12 +24,11 @@ home_cmd = "G92 X0 Y0 Z0 A0"
 slot_count = 3
 initial_tool = 0
 park_x = 75
-dock_x = 78
 release_x = 70
 slide_in_mm = 20
-slide_index_mm = 15
 slide_out_mm = 0
 slot0_deg = 10
+twist_deg = 45
 atc_feed = 600
 
 [grbl]
