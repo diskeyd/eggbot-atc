@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>에그봇 G-code 생성기 – 제출 문서</title>
+<style>
+  @page { size: A4; margin: 20mm 17mm 20mm 17mm;
+          @bottom-center { content: counter(page); font: 9pt "Apple SD Gothic Neo", sans-serif; color: #666; } }
+  @page :first { margin: 0; @bottom-center { content: none; } }
+  :root { --ink:#1b1f24; --sub:#586069; --line:#d0d7de; --head:#0b3d6e; --soft:#f3f6fa; --warn:#fff4e5; --warnb:#e8a33d; --bad:#fdecec; --badb:#d14343; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "Apple SD Gothic Neo","AppleSDGothicNeo","Malgun Gothic",sans-serif; font-size: 10pt; line-height: 1.6; color: var(--ink); background:#fff; margin:0; word-break: keep-all; overflow-wrap: break-word; }
+  h1 { font-size: 17pt; color: var(--head); border-bottom: 2px solid var(--head); padding-bottom: 4px; margin: 26px 0 10px; break-after: avoid; }
+  h1.first, h1.pb { margin-top: 0; }
+  h1.pb { break-before: page; }
+  h2 { font-size: 12.5pt; color: var(--head); margin: 18px 0 6px; break-after: avoid; }
+  h3 { font-size: 10.5pt; margin: 12px 0 4px; break-after: avoid; }
+  p { margin: 5px 0; }
+  ul, ol { margin: 4px 0 6px; padding-left: 20px; }
+  li { margin: 2px 0; }
+  code { font-family: Menlo, "D2Coding", monospace; font-size: 8.8pt; background: #eef1f4; padding: 0 3px; border-radius: 3px; word-break: break-all; }
+  pre { font-family: Menlo, "D2Coding", monospace; font-size: 8.3pt; line-height: 1.45; background: #f6f8fa; border: 1px solid var(--line); border-left: 3px solid var(--head); border-radius: 3px; padding: 7px 10px; margin: 7px 0; white-space: pre-wrap; break-inside: avoid; }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  table { border-collapse: collapse; width: 100%; margin: 7px 0 10px; font-size: 9pt; }
+  thead { display: table-header-group; }
+  th, td { border: 1px solid var(--line); padding: 4px 7px; text-align: left; vertical-align: top; }
+  th { background: var(--soft); color: var(--head); font-weight: 700; }
+  tr { break-inside: avoid; }
+  .note, .warn, .bad { border-left: 4px solid var(--head); background: var(--soft); padding: 6px 11px; margin: 9px 0; border-radius: 0 4px 4px 0; break-inside: avoid; }
+  .warn { border-color: var(--warnb); background: var(--warn); }
+  .bad  { border-color: var(--badb); background: var(--bad); }
+  .note b.t, .warn b.t, .bad b.t { display: block; margin-bottom: 2px; }
+  figure { margin: 10px 0; break-inside: avoid; text-align: center; }
+  figcaption { font-size: 8.8pt; color: var(--sub); margin-top: 3px; }
+  svg { max-width: 100%; height: auto; }
+  .small { font-size: 8.8pt; color: var(--sub); }
+
+  /* cover */
+  .cover { height: 297mm; padding: 0; position: relative; background: linear-gradient(180deg, #0b3d6e 0 46%, #fff 46% 100%); break-after: page; }
+  .cover .top { padding: 34mm 22mm 0; color: #fff; }
+  .cover .course { font-size: 13pt; letter-spacing: .06em; opacity: .92; }
+  .cover h1.title { font-size: 31pt; line-height: 1.25; color: #fff; border: 0; margin: 14mm 0 5mm; padding: 0; break-before: auto; }
+  .cover .subtitle { font-size: 13pt; line-height: 1.6; opacity: .95; }
+  .cover .meta { position: absolute; left: 22mm; right: 22mm; top: 150mm; font-size: 11pt; }
+  .cover .meta table { font-size: 11pt; }
+  .cover .meta th { width: 34mm; }
+  .cover .foot { position: absolute; left: 22mm; right: 22mm; bottom: 20mm; font-size: 9pt; color: var(--sub); border-top: 1px solid var(--line); padding-top: 6px; }
+
+  /* toc */
+  .toc { columns: 2; column-gap: 12mm; font-size: 10.5pt; line-height: 1.9; list-style: none; padding: 0; }
+  .toc li { break-inside: avoid; }
+  .toc .must { font-weight: 700; color: var(--head); }
+  .badge { display:inline-block; font-size: 7.6pt; background: var(--head); color:#fff; border-radius: 9px; padding: 0 6px; margin-left: 4px; vertical-align: 1px; font-weight: 400; }
+</style>
+</head>
+<body>
+
+<!-- ============ 표지 ============ -->
+<section class="cover">
+  <div class="top">
+    <div class="course">캡스톤 디자인 2 · 13분반 · 3조</div>
+    <h1 class="title">에그봇 G-code 생성기</h1>
+    <div class="subtitle">이미지 벡터화 · 3D 시뮬레이션<br>회전식 펜 매거진(ATC) · GRBL 시리얼 통합 제어 프로그램<br>설치·실행·연결 매뉴얼 및 프로그램 분석 보고서</div>
+  </div>
+  <div class="meta">
+    <table>
+      <tr><th>과목</th><td>캡스톤 디자인 2</td></tr>
+      <tr><th>분반 / 조</th><td>13분반 / 3조</td></tr>
+      <tr><th>대상 프로그램</th><td>캡스톤 디자인2_13분반_3조_프로그램.py (7,283줄, Python / Tkinter)</td></tr>
+      <tr><th>관련 저장소</th><td>https://github.com/diskeyd/eggbot-atc</td></tr>
+      <tr><th>작성일</th><td>2026-11-23</td></tr>
+    </table>
+  </div>
+  <div class="foot">이 문서의 수치는 소스 코드, 설정 화면, 저장소 문서에서 옮긴 값이다. 기계 실측으로 안전성을 확인한 값이 아니다. 자세한 내용은 13장 참고.</div>
+</section>
+
+<!-- ============ 목차 ============ -->
+<h1 class="first">목차</h1>
+<ol class="toc">
+  <li>1. 프로그램 개요</li>
+  <li class="must">2. 설치 <span class="badge">필수</span></li>
+  <li class="must">3. 실행 <span class="badge">필수</span></li>
+  <li class="must">4. 의존성 <span class="badge">필수</span></li>
+  <li>5. 기본 사용 순서</li>
+  <li class="must">6. 기계 연결 및 제어 <span class="badge">필수</span></li>
+  <li>7. 설정값 안내</li>
+  <li class="must">8. 문제 해결 <span class="badge">필수</span></li>
+  <li>9. 안전 주의사항</li>
+  <li>10. 소프트웨어 구조</li>
+  <li>11. 핵심 알고리즘</li>
+  <li>12. G-code와 ATC 교환 시퀀스</li>
+  <li>13. 한계 및 향후 과제</li>
+  <li>부록. 관련 저장소 문서</li>
+</ol>
+
+<div class="note"><b class="t">문서 기준</b>
+기준 프로그램은 <code>캡스톤 디자인2_13분반_3조_프로그램.py</code>이다. 배포 형태는 Windows용 EXE이다. Python 소스를 직접 실행하는 방법도 함께 적었다.<br>
+설정값 중 "사진 기준 입력 예시"는 설정 화면에 표시된 값을 옮긴 것이다. 기계 실측으로 안전성이 확인된 값이 아니고, 프로그램의 초기 기본값도 아니다.</div>
+
+<!-- ============ 1 ============ -->
+<h1>1. 프로그램 개요</h1>
+<p>에그봇 G-code 생성기는 이미지에서 선과 영역을 추출해 달걀 또는 공 표면에 그림을 그리기 위한 G-code를 만드는 Windows용 프로그램이다. GRBL 컨트롤러와 USB로 연결하면 생성한 G-code를 기계로 전송한다.</p>
+
+<h2>1-1. 주요 기능</h2>
+<ul>
+  <li>이미지 불러오기, 자동 선·영역 추출</li>
+  <li>색상별 영역 지정, 펜 색상 배정</li>
+  <li>영역 채우기, 테두리 그리기, 지그재그 채우기</li>
+  <li>직접 선 그리기, 지우개</li>
+  <li>물체 크기·위치·회전 조정 (달걀 / 탁구공 / 골프공)</li>
+  <li>3D 미리보기, G-code 확인·수정</li>
+  <li>1~3개 펜 설정, 회전식 펜 매거진(ATC) 설정, 교환 순서 미리보기, 교환 시험</li>
+  <li>USB 시리얼 GRBL 연결, G-code 전송, 일시정지·재개·정지</li>
+  <li>작업 파일 저장·불러오기, 20초 간격 자동 저장</li>
+</ul>
+
+<h2>1-2. 지원 형식</h2>
+<table>
+  <thead><tr><th style="width:28%">구분</th><th style="width:30%">형식</th><th>용도</th></tr></thead>
+  <tbody>
+    <tr><td>입력 이미지</td><td>PNG, JPG, JPEG, BMP, GIF, WEBP</td><td>선·영역 추출 원본</td></tr>
+    <tr><td>작업 파일</td><td><code>.eggbot</code></td><td>이미지와 작업 설정을 포함한 작업 파일 (내부는 JSON)</td></tr>
+    <tr><td>G-code</td><td><code>.gcode</code>, <code>.nc</code>, <code>.ngc</code></td><td>기계에 전송하거나 다른 프로그램에서 사용</td></tr>
+    <tr><td>작업 데이터</td><td><code>.json</code></td><td>작업 불러오기에서 읽는 호환 형식</td></tr>
+  </tbody>
+</table>
+
+<h2>1-3. 처리 흐름</h2>
+<figure>
+<svg viewBox="0 0 760 118" width="760" xmlns="http://www.w3.org/2000/svg" font-family="Apple SD Gothic Neo, sans-serif">
+  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0b3d6e"/></marker></defs>
+  <g font-size="12" text-anchor="middle" fill="#1b1f24">
+    <rect x="4" y="30" width="82" height="56" rx="6" fill="#f3f6fa" stroke="#0b3d6e"/><text x="45" y="55">이미지</text><text x="45" y="72" font-size="10" fill="#586069">PNG·JPG 등</text>
+    <rect x="106" y="30" width="86" height="56" rx="6" fill="#f3f6fa" stroke="#0b3d6e"/><text x="149" y="55">영역 추출</text><text x="149" y="72" font-size="10" fill="#586069">배경·색·밝기</text>
+    <rect x="212" y="30" width="86" height="56" rx="6" fill="#f3f6fa" stroke="#0b3d6e"/><text x="255" y="55">윤곽 추적</text><text x="255" y="72" font-size="10" fill="#586069">단순화·채우기</text>
+    <rect x="318" y="30" width="86" height="56" rx="6" fill="#f3f6fa" stroke="#0b3d6e"/><text x="361" y="55">표면 매핑</text><text x="361" y="72" font-size="10" fill="#586069">각도·높이</text>
+    <rect x="424" y="30" width="86" height="56" rx="6" fill="#f3f6fa" stroke="#0b3d6e"/><text x="467" y="55">G-code</text><text x="467" y="72" font-size="10" fill="#586069">ATC 교환 삽입</text>
+    <rect x="530" y="30" width="86" height="56" rx="6" fill="#f3f6fa" stroke="#0b3d6e"/><text x="573" y="55">서보 변환</text><text x="573" y="72" font-size="10" fill="#586069">M3 S → M96 A</text>
+    <rect x="636" y="30" width="120" height="56" rx="6" fill="#0b3d6e"/><text x="696" y="55" fill="#fff">GRBL 전송</text><text x="696" y="72" font-size="10" fill="#dbe7f3">USB 115200 bps</text>
+  </g>
+  <g stroke="#0b3d6e" stroke-width="1.6" marker-end="url(#ar)"><line x1="86" y1="58" x2="104" y2="58"/><line x1="192" y1="58" x2="210" y2="58"/><line x1="298" y1="58" x2="316" y2="58"/><line x1="404" y1="58" x2="422" y2="58"/><line x1="510" y1="58" x2="528" y2="58"/><line x1="616" y1="58" x2="634" y2="58"/></g>
+  <text x="380" y="14" text-anchor="middle" font-size="11" fill="#586069">화면 미리보기(펼친 모습 + 3D)는 G-code 생성 단계의 결과를 그대로 그린다.</text>
+</svg>
+<figcaption>그림 1. 이미지에서 기계 전송까지의 처리 흐름</figcaption>
+</figure>
+
+<!-- ============ 2 설치 ============ -->
+<h1>2. 설치</h1>
+<h2>2-1. EXE 배포본을 받은 경우</h2>
+<p>사용자는 Python을 설치하지 않는다. 다음 순서로 준비한다.</p>
+<ol>
+  <li>전달받은 압축 파일을 푼다.</li>
+  <li>압축을 푼 폴더에서 <code>EggBot.exe</code>(또는 배포자가 지정한 실행 파일)를 찾는다.</li>
+  <li>USB 연결용 Windows 드라이버를 설치한다. 컨트롤러가 COM 포트로 보여야 한다. (4장 참고)</li>
+</ol>
+<div class="note"><b class="t">배포 방식별 유의사항</b>
+단일 파일 방식 EXE는 실행 파일만 있으면 된다. 폴더 방식은 EXE를 따로 꺼내지 않는다. 함께 들어 있는 폴더와 파일을 그대로 둔다.</div>
+
+<h2>2-2. Python 소스로 설치하는 경우 (개발·EXE 제작 담당)</h2>
+<ol>
+  <li>Python을 설치한다. Tkinter가 포함된 배포판을 쓴다.</li>
+  <li>패키지를 설치한다.</li>
+</ol>
+<pre><code>python -m pip install pillow pyserial pyinstaller</code></pre>
+<ol start="3"><li>소스 파일 <code>캡스톤 디자인2_13분반_3조_프로그램.py</code>를 작업 폴더에 둔다.</li></ol>
+
+<h2>2-3. EXE 직접 만들기</h2>
+<pre><code>pyinstaller --noconfirm --clean --onefile --windowed --name EggBot "캡스톤 디자인2_13분반_3조_프로그램.py"</code></pre>
+<ul>
+  <li>결과물은 보통 <code>dist</code> 폴더에 생긴다.</li>
+  <li>빌드 후 다른 PC에서 EXE를 실행한다. 이미지 열기와 USB 포트 검색까지 확인한다.</li>
+  <li>포트 검색이 EXE에서 안 되면 PyInstaller 빌드 로그와 pyserial 포함 여부를 확인한다.</li>
+</ul>
+<div class="warn"><b class="t">검증 범위</b>
+이 문서를 작성한 환경은 macOS이다. EXE 빌드와 Windows 실행은 이 환경에서 하지 않았다. 위 명령은 README 기준을 그대로 옮긴 것이다. 소스 구문 검사(Python AST 파싱)만 통과를 확인했다.</div>
+
+<!-- ============ 3 실행 ============ -->
+<h1>3. 실행</h1>
+<h2>3-1. EXE 실행</h2>
+<ol>
+  <li>실행 파일을 더블클릭한다.</li>
+  <li>메인 창 제목이 <b>에그봇 G코드 생성기</b>로 표시되면 실행된 것이다.</li>
+  <li>창 크기는 1380×900이다. 최소 크기는 1100×720이다.</li>
+</ol>
+<h2>3-2. 소스 직접 실행</h2>
+<pre><code>python "캡스톤 디자인2_13분반_3조_프로그램.py"</code></pre>
+<p>진입점은 파일 끝의 <code>main()</code>이다. <code>App().mainloop()</code>를 호출한다. Pillow가 없으면 <code>main()</code>이 설치 안내 문구를 출력한다. 이미지 처리는 Pillow가 필요하다.</p>
+<h2>3-3. 이전 작업 복원</h2>
+<p>프로그램은 20초마다 작업을 자동 저장한다. 다시 실행하면 이전 작업이 복원된다. 새 작업은 <b>새로 시작</b>을 누른다. 필요한 기존 작업은 먼저 <code>.eggbot</code> 파일로 저장한다.</p>
+<h2>3-4. 실행이 되지 않는 경우</h2>
+<ul>
+  <li>Windows가 실행 파일을 차단하거나 오류 창을 띄우면, EXE가 정상 빌드되었는지 확인하고 제작자에게 문의한다.</li>
+  <li>이미지가 열리지 않으면 EXE에 Pillow가 포함되었는지 확인한다.</li>
+  <li>포트가 보이지 않으면 6장과 8장을 확인한다.</li>
+</ul>
+
+<!-- ============ 4 의존성 ============ -->
+<h1>4. 의존성</h1>
+<h2>4-1. EXE 사용자</h2>
+<p>정상 패키징된 EXE에는 Python 실행 환경과 라이브러리가 들어 있다. 별도 Python 설치는 필요 없다.</p>
+<p>단, 보드의 <b>USB-시리얼 드라이버</b>는 EXE에 들어 있지 않다. PC가 컨트롤러를 COM 포트로 인식해야 한다.</p>
+<h2>4-2. 개발·EXE 제작 담당</h2>
+<table>
+  <thead><tr><th style="width:17%">구성요소</th><th style="width:36%">용도</th><th>필요 여부 / 없을 때 동작</th></tr></thead>
+  <tbody>
+    <tr><td>Python</td><td>프로그램 실행, EXE 빌드</td><td>소스 실행·빌드 시 필수</td></tr>
+    <tr><td>Tkinter</td><td>GUI 전체</td><td>Python 배포판에 포함된 표준 라이브러리</td></tr>
+    <tr><td>Pillow</td><td>이미지 열기, 영역 추출, 색 양자화</td><td>필수. 없으면 이미지를 열 수 없다.</td></tr>
+    <tr><td>pyserial</td><td>USB 시리얼 / GRBL 통신</td><td>기계 연결 시 필수. 없으면 연결 시 안내 로그를 남기고 연결하지 않는다. 포트 목록은 빈 상태이다.</td></tr>
+    <tr><td>PyInstaller</td><td>Python 파일을 EXE로 패키징</td><td>EXE 제작 시에만 필요</td></tr>
+  </tbody>
+</table>
+<p>그 밖의 모듈(<code>json</code>, <code>math</code>, <code>re</code>, <code>threading</code>, <code>queue</code>, <code>ast</code> 등)은 모두 Python 표준 라이브러리이다. 소스 첫 부분에서 Pillow와 pyserial을 선택적으로 가져온다 (<code>HAS_PIL</code>, <code>HAS_SERIAL</code>).</p>
+<h2>4-3. 펌웨어 의존성</h2>
+<p>PC 쪽 라이브러리와 별개로, 컨트롤러 펌웨어가 다음을 지원해야 실제 기계가 움직인다. 자세한 내용은 6장에 있다.</p>
+<ul>
+  <li>5축 이상 (ATC 매거진 축 Z, 접근 축 A). 기본 GRBL 1.1은 3축이라 <code>error:20</code>이 난다.</li>
+  <li>서보 명령 <code>M96 A값</code>. 소스는 <code>grbl-Mega-5X-servos</code> 계열 펌웨어를 기준으로 한다.</li>
+</ul>
+
+<!-- ============ 5 사용 ============ -->
+<h1>5. 기본 사용 순서</h1>
+<h2>5-1. 이미지 불러오기</h2>
+<ol>
+  <li>왼쪽 <b>1. 이미지 열기</b>를 누른다.</li>
+  <li>PNG/JPG/JPEG/BMP/GIF/WEBP 파일을 고른다.</li>
+  <li>가운데 작업 화면에 이미지가 나오는지 확인한다.</li>
+</ol>
+<p class="small">긴 변이 1400 px보다 크면 줄이고, 1000 px보다 작으면 부드럽게 키운 뒤 윤곽을 딴다.</p>
+
+<h2>5-2. 선 추출과 영역 지정</h2>
+<p>왼쪽 <b>선 추출</b> 탭에서 조절한다.</p>
+<table>
+  <thead><tr><th style="width:26%">항목</th><th>설명</th></tr></thead>
+  <tbody>
+    <tr><td>선 추출 방식</td><td>자동(배경 제거) / 색 영역 나누기 / 어두운 선(밝기)</td></tr>
+    <tr><td>배경 민감도</td><td>배경과 그림을 구분하는 정도</td></tr>
+    <tr><td>색 개수 · 그라데이션 색 합치기</td><td>컬러 그림의 영역 구분</td></tr>
+    <tr><td>밝기 임계값 · 최소 영역 크기</td><td>어두운 선 추출, 작은 잡티 제거</td></tr>
+    <tr><td>외곽선 단순화</td><td>추출한 선의 점 개수와 형태</td></tr>
+  </tbody>
+</table>
+<p>가운데 작업 화면의 도구는 네 가지이다: <b>영역 채우기</b>, <b>색 칠하기</b>, <b>직접 그리기</b>, <b>지우개</b>. 직접 그린 선도 G-code에 들어간다.</p>
+<p>추출 결과가 예상과 다르면 방식을 바꾸고 민감도와 최소 영역 크기를 조정한다. 추출 설정을 바꾸면 채우기 선택이 초기화될 수 있다. 영역을 다시 지정한다.</p>
+
+<h2>5-3. 물체와 위치 설정</h2>
+<ul>
+  <li>물체 종류: 달걀, 탁구공, 골프공. 길이·지름·뾰족함을 입력한다.</li>
+  <li>그림의 회전 위치, 세로 위치, 세로 크기, 가로 배율, 회전 각도를 조정한다. 오른쪽 <b>펼친 모습</b> 창에서 드래그로도 조정한다.</li>
+  <li>펜 팔 최대 각도를 설정한다.</li>
+</ul>
+<p>화면의 미리보기와 실제 기계의 물체 크기·원점·펜 위치가 일치하는지 확인한다.</p>
+
+<h2>5-4. 펜과 속도 설정</h2>
+<p><b>펜·속도</b> 탭에서 펜 올림/내림 값, 딜레이, 그리기 속도, 이동 속도를 설정한다. 서보와 펌웨어에 맞는 값인지 먼저 시험한다.</p>
+
+<h2>5-5. 3D 미리보기와 G-code 확인</h2>
+<ol>
+  <li><b>3D 미리보기 창 열기</b>로 그림 경로를 확인한다.</li>
+  <li>ATC를 쓰면 <b>펜 교환 설정</b> 창에서 교환 순서를 확인한다.</li>
+  <li><b>G코드 확인·수정</b>에서 명령과 좌표를 점검한다.</li>
+  <li>필요하면 <b>G코드 저장</b>으로 <code>.gcode</code> 파일을 저장한다.</li>
+</ol>
+<div class="note"><b class="t">저장 경로에 따라 서보 명령이 다르다</b>
+메인 창의 <b>G코드 저장</b>은 <code>M3 S</code>를 <code>M96 A</code>로 바꿔 저장한다. <b>G코드 확인·수정</b> 창의 저장은 화면 텍스트를 그대로 저장한다 (소스 확인). 기계에 보낼 파일은 메인 창의 저장 또는 직접 전송을 쓴다.</div>
+
+<h2>5-6. 작업 저장과 불러오기</h2>
+<ul>
+  <li><b>작업 저장</b>: 이미지, 영역 선택, 펜 지정, 작업 설정을 <code>.eggbot</code>으로 저장한다.</li>
+  <li><b>작업 불러오기</b>: <code>.eggbot</code> 또는 지원되는 <code>.json</code>을 연다.</li>
+  <li><b>새로 시작</b>: 현재 작업을 초기화한다.</li>
+  <li>ATC 메커니즘 설정은 작업 파일과 별도 파일에 저장된다 (7-5 참고).</li>
+</ul>
+
+<!-- ============ 6 연결 ============ -->
+<h1>6. 기계 연결 및 제어</h1>
+<h2>6-1. 시스템 구성</h2>
+<figure>
+<svg viewBox="0 0 760 250" width="760" xmlns="http://www.w3.org/2000/svg" font-family="Apple SD Gothic Neo, sans-serif">
+  <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0b3d6e"/></marker></defs>
+  <g font-size="12" text-anchor="middle" fill="#1b1f24">
+    <rect x="6" y="60" width="150" height="110" rx="7" fill="#f3f6fa" stroke="#0b3d6e"/>
+    <text x="81" y="86" font-weight="700">Windows PC</text><text x="81" y="106" font-size="11">에그봇 G코드 생성기</text><text x="81" y="124" font-size="11">(EXE 또는 Python)</text><text x="81" y="146" font-size="10" fill="#586069">pyserial · COM 포트</text>
+    <rect x="236" y="60" width="170" height="110" rx="7" fill="#f3f6fa" stroke="#0b3d6e"/>
+    <text x="321" y="86" font-weight="700">컨트롤러 보드</text><text x="321" y="106" font-size="11">Arduino Mega 2560 + RAMPS 1.4</text><text x="321" y="124" font-size="11">5축 GRBL (M96 지원 빌드)</text><text x="321" y="146" font-size="10" fill="#586069">스텝 드라이버 DRV8825</text>
+    <rect x="520" y="8" width="234" height="40" rx="6" fill="#fff" stroke="#0b3d6e"/><text x="637" y="32">X · 펜 팔 회전 (도)</text>
+    <rect x="520" y="56" width="234" height="40" rx="6" fill="#fff" stroke="#0b3d6e"/><text x="637" y="80">Y · 달걀 회전 (도)</text>
+    <rect x="520" y="104" width="234" height="40" rx="6" fill="#fff" stroke="#0b3d6e"/><text x="637" y="128">Z · 펜 매거진 회전 (도)</text>
+    <rect x="520" y="152" width="234" height="40" rx="6" fill="#fff" stroke="#0b3d6e"/><text x="637" y="176">A · ATC 직선 이송 (mm)</text>
+    <rect x="520" y="200" width="234" height="40" rx="6" fill="#fff" stroke="#0b3d6e"/><text x="637" y="224">서보 · 펜 올림/내림 (M96 A)</text>
+  </g>
+  <g stroke="#0b3d6e" stroke-width="1.6" marker-end="url(#ar2)" fill="none">
+    <line x1="156" y1="115" x2="234" y2="115"/><line x1="236" y1="130" x2="158" y2="130"/>
+    <path d="M406 100 L460 100 L460 28 L518 28"/><path d="M406 108 L450 108 L450 76 L518 76"/><path d="M406 116 L450 116 L450 124 L518 124"/><path d="M406 128 L460 128 L460 172 L518 172"/><path d="M406 140 L440 140 L440 220 L518 220"/>
+  </g>
+  <text x="195" y="106" text-anchor="middle" font-size="10" fill="#586069">USB 115200 bps</text>
+  <text x="195" y="146" text-anchor="middle" font-size="10" fill="#586069">ok / 상태 '?'</text>
+</svg>
+<figcaption>그림 2. 시스템 구성과 축 배정 (기본 축 설정 기준. 축 설정 창에서 X/Y 역할과 방향을 바꿀 수 있다.)</figcaption>
+</figure>
+
+<table>
+  <thead><tr><th style="width:12%">축</th><th style="width:30%">기본 역할</th><th>비고</th></tr></thead>
+  <tbody>
+    <tr><td>X</td><td>펜 팔 회전 (높이 방향)</td><td>축 설정에서 "X를 회전각으로" 및 방향 반전 가능</td></tr>
+    <tr><td>Y</td><td>달걀 회전</td><td>방향 반전 가능</td></tr>
+    <tr><td>Z</td><td>펜 매거진(턴테이블) 회전</td><td>ATC 설정 기본값. 축 글자는 바꿀 수 있다.</td></tr>
+    <tr><td>A</td><td>ATC 직선 접근</td><td>기본 GRBL 1.1(3축)은 지원하지 않는다.</td></tr>
+    <tr><td>서보</td><td>펜 올림/내림</td><td><code>M96 A값</code> (6-4 참고)</td></tr>
+  </tbody>
+</table>
+
+<h2>6-2. USB 연결 순서</h2>
+<ol>
+  <li>컨트롤러 전원을 켠다.</li>
+  <li>데이터 통신이 되는 USB 케이블로 PC와 컨트롤러를 연결한다. 충전 전용 케이블은 안 된다.</li>
+  <li>Arduino IDE 시리얼 모니터, UGS처럼 같은 COM 포트를 쓰는 프로그램을 끈다.</li>
+  <li>프로그램 아래쪽 <b>5. 기계 연결 / 제어(GRBL)</b> 영역에서 <b>새로고침</b>을 누른다.</li>
+  <li>포트 목록에서 컨트롤러의 COM 번호를 고른다.</li>
+  <li><b>연결</b>을 누른다.</li>
+  <li>상태 표시가 <b>연결됨</b>으로 바뀌는지 확인한다.</li>
+</ol>
+<p>기본 시리얼 통신 속도는 <b>115200 bps</b>이다.</p>
+
+<h2>6-3. 주요 기계 제어 버튼</h2>
+<table>
+  <thead><tr><th style="width:25%">버튼</th><th>기능</th></tr></thead>
+  <tbody>
+    <tr><td>새로고침</td><td>연결 가능한 COM 포트를 다시 검색</td></tr>
+    <tr><td>연결 / 끊기</td><td>GRBL 컨트롤러 연결 및 해제</td></tr>
+    <tr><td>펜 올림 / 펜 내림</td><td>설정한 서보 명령을 수동 전송</td></tr>
+    <tr><td>여기를 원점(0,0)으로</td><td>현재 위치를 작업 원점으로 지정</td></tr>
+    <tr><td>원점으로 이동</td><td>설정된 작업 원점으로 이동</td></tr>
+    <tr><td>잠금해제 $X</td><td>GRBL 알람 잠금 해제 명령 전송</td></tr>
+    <tr><td>축 설정</td><td>X/Y 회전축 배치와 방향 반전</td></tr>
+    <tr><td>회전 보정</td><td>회전축의 실제 회전량 기준으로 배율 보정</td></tr>
+    <tr><td>GRBL 설정</td><td><code>$$</code> 설정 확인 및 변경</td></tr>
+    <tr><td>오류 기록</td><td>최근 GRBL 오류·알람 확인</td></tr>
+    <tr><td>X− / X+ / Y− / Y+</td><td>선택한 조그 거리(1/5/10도)만큼 축 이동. <b>※ 13장 참고: 소스 확인 결과 이 버튼의 전송 호출이 연결되어 있지 않다.</b></td></tr>
+    <tr><td>그리기 시작</td><td>현재 G-code를 기계로 전송</td></tr>
+    <tr><td>일시정지 / 재개</td><td>기계 작업 일시정지 및 재개</td></tr>
+    <tr><td>비상 정지</td><td>소프트웨어 홀드와 GRBL 소프트 리셋 전송</td></tr>
+    <tr><td>초기화</td><td>프로그램의 작업 대기열만 초기화 (기계는 리셋하지 않는다)</td></tr>
+    <tr><td>직접 명령 / 보내기</td><td>GRBL 명령을 한 줄씩 전송</td></tr>
+  </tbody>
+</table>
+
+<h2>6-4. 펌웨어 호환</h2>
+<h3>축</h3>
+<p>ATC 매거진 축과 접근 축까지 쓰려면 5축 이상 펌웨어가 필요하다. 기본 GRBL 1.1은 X/Y/Z 3축이다. A축 명령에서 <code>error:20</code>이 난다. 사용하는 보드·펌웨어가 지원하는 축 문자와 이동 범위를 먼저 확인한다.</p>
+<h3>펜 서보 명령</h3>
+<p>화면의 펜 올림/내림 값은 <code>M3 S값</code>이다. 기계로 전송하거나 G-code를 저장할 때 프로그램이 이것을 <code>M96 A값</code>으로 바꾼다.</p>
+<table>
+  <thead><tr><th style="width:36%">설정 (소스 상수)</th><th>값</th></tr></thead>
+  <tbody>
+    <tr><td><code>SERVO_M96</code></td><td>True (변환 사용)</td></tr>
+    <tr><td><code>SERVO_CHANNEL</code></td><td>"A" → RAMPS SERVO0 / D11</td></tr>
+    <tr><td><code>SERVO_INVERT</code></td><td>True (<code>A = 499 − A</code>)</td></tr>
+    <tr><td>변환식</td><td><code>A = round(S × 499 / 180)</code>, S는 0~180으로 제한</td></tr>
+  </tbody>
+</table>
+<pre><code>M3 S90  →  G4 P0 / M96 A249     (pen_up 기본값)
+M3 S30  →  G4 P0 / M96 A416     (pen_down 기본값)</code></pre>
+<p><code>M96</code>은 GRBL의 이동 큐와 동기화되지 않는다. 그래서 변환할 때 앞에 <code>G4 P0</code>(이동이 끝날 때까지 대기)을 붙인다.</p>
+<p>일반 GRBL만 올린 보드는 <code>M96</code>을 모른다. G-code가 화면에 보여도 서보가 움직이지 않는다. 서보 채널, 방향, 배선이 프로그램 설정과 맞는지 확인한다.</p>
+
+<h3>저장소 문서와의 차이 (펌웨어 확인 필수)</h3>
+<table>
+  <thead><tr><th style="width:20%">항목</th><th style="width:40%">제출 프로그램 (이 문서 기준)</th><th>저장소 <code>eggbot-atc</code> (초기 설계 문서)</th></tr></thead>
+  <tbody>
+    <tr><td>서보 명령</td><td><code>M96 A값</code>, 채널 A = RAMPS SERVO0 / D11</td><td><code>M3 S값</code> 스핀들 PWM, 신호선 D6</td></tr>
+    <tr><td>펌웨어</td><td><code>grbl-Mega-5X-servos</code> 계열 (소스 주석)</td><td>grbl-Mega-5X에서 PWM 핀을 D6으로 바꾼 빌드 (<code>grbl-mega-5x-d6.hex</code>). M96 서보 포크는 대안으로만 언급.</td></tr>
+    <tr><td>펜 교환 방식</td><td>회전 매거진 + 도킹 이동 스크립트 (슬롯 간격 5.4°, 설정 가능)</td><td>120° 간격 + 45° 비틀기(twist)</td></tr>
+    <tr><td>입력</td><td>래스터 이미지</td><td>Inkscape SVG (레이어 = 펜)</td></tr>
+  </tbody>
+</table>
+<div class="warn"><b class="t">배선과 펌웨어를 프로그램 설정에 맞춘다</b>
+서보 신호선을 D6에 꽂고 펌웨어가 D6 스핀들 PWM 빌드이면, 이 프로그램이 보내는 <code>M96 A…</code>는 서보를 움직이지 못한다. 반대로 SERVO0(D11)에 꽂고 <code>M96</code> 펌웨어를 쓰면 프로그램 설정과 맞는다. 둘 중 어느 쪽이 실제 기계인지는 이 문서에서 확인하지 못했다. 시험 전에 확인한다. RAMPS의 D8/D9/D10은 12 V MOSFET 출력이다. 서보 신호선을 연결하지 않는다.</div>
+
+<h2>6-5. 물리 구성 참고 (저장소 하드웨어 문서)</h2>
+<ul>
+  <li>보드: Arduino Mega 2560 R3 + RAMPS 1.4. 스텝 드라이버 DRV8825 4개 (1/32 마이크로스텝 점퍼).</li>
+  <li>모터: NEMA17 4개 (X 펜 팔, Y 달걀, Z 매거진, A 슬라이드). 서보: MG90S 1개.</li>
+  <li>서보 전원은 보드의 5 V 핀이 아니라 별도 5 V DC-DC 출력에서 받는다.</li>
+  <li>엔드스탑은 아직 달지 않았다. 원점은 손으로 맞춘다 (프로그램의 <b>여기를 원점으로</b> 사용).</li>
+</ul>
+
+<!-- ============ 7 설정값 ============ -->
+<h1>7. 설정값 안내</h1>
+<div class="warn"><b class="t">읽기 전에</b>
+7-1~7-3의 값은 설정 화면 사진에 표시된 값을 정리한 것이다. 프로그램 내부 초기 기본값과 다를 수 있다. 기계의 실측값이나 안전한 운전값으로 인증된 것이 아니다.</div>
+
+<h2>7-1. 펜·속도 탭 — 사진 기준 입력 예시</h2>
+<table>
+  <thead><tr><th>항목</th><th>사진에 표시된 값</th><th>단위 / 설명</th></tr></thead>
+  <tbody>
+    <tr><td>펜 올림 서보(S)</td><td>170</td><td>펜을 올리는 서보 설정값</td></tr>
+    <tr><td>펜 내림 서보(S)</td><td>100</td><td>펜을 내리는 서보 설정값</td></tr>
+    <tr><td>펜 딜레이</td><td>300</td><td>ms</td></tr>
+    <tr><td>그리기 속도(F)</td><td>1500</td><td>G-code 이송 속도</td></tr>
+    <tr><td>이동 속도(F)</td><td>3000</td><td>G-code 이동 속도</td></tr>
+  </tbody>
+</table>
+
+<h2>7-2. ATC 메커니즘 설정 — 사진 기준 입력 예시</h2>
+<h3>교환 위치 / 순서</h3>
+<table>
+  <thead><tr><th style="width:42%">항목</th><th style="width:20%">사진 상태 / 값</th><th>의미</th></tr></thead>
+  <tbody>
+    <tr><td>원점(펜 팔 0도)에서 교환</td><td>체크</td><td>펜 교환 시 X0 Y0 기계 원점으로 이동</td></tr>
+    <tr><td>다 그리면 처음 펜으로 되돌려 교체</td><td>체크</td><td>모든 그림을 마친 뒤 시작 펜으로 복귀 교체</td></tr>
+    <tr><td>면적 큰 색부터 그리기</td><td>체크 해제</td><td>색 번호 순서로 작업</td></tr>
+    <tr><td>교환 높이</td><td>34.0 mm</td><td>원점 교환을 끈 경우 사용하는 교환 높이</td></tr>
+  </tbody>
+</table>
+<h3>교환 방식 / 축, 매거진 회전, ATC 직선 이동</h3>
+<table>
+  <thead><tr><th style="width:36%">항목</th><th style="width:22%">사진에 표시된 값</th><th>단위 / 설명</th></tr></thead>
+  <tbody>
+    <tr><td>교환 방식</td><td>회전 매거진(ATC)</td><td>펜 슬롯을 회전시켜 교체</td></tr>
+    <tr><td>매거진(턴테이블) 축</td><td>Z</td><td>턴테이블 회전축</td></tr>
+    <tr><td>ATC 접근 축</td><td>A</td><td>펜 홀더로 접근하는 직선축</td></tr>
+    <tr><td>슬롯 간 각도</td><td>5.3</td><td>도(°)</td></tr>
+    <tr><td>회전 오프셋</td><td>0.0</td><td>도(°)</td></tr>
+    <tr><td>회전 속도</td><td>1000</td><td>도/분</td></tr>
+    <tr><td>접근 보정각 H</td><td>0.0</td><td>도(°)</td></tr>
+    <tr><td>홈(대기) 각도</td><td>0.0</td><td>도(°)</td></tr>
+    <tr><td>대기(오른쪽) 위치</td><td>−10</td><td>mm</td></tr>
+    <tr><td>도킹 위치</td><td>−248</td><td>mm</td></tr>
+    <tr><td>이동 속도</td><td>500</td><td>mm/분</td></tr>
+    <tr><td>교환 대기</td><td>600</td><td>ms</td></tr>
+  </tbody>
+</table>
+<h3>그 밖의 항목</h3>
+<table>
+  <thead><tr><th style="width:42%">항목</th><th style="width:20%">사진 상태 / 값</th><th>설명</th></tr></thead>
+  <tbody>
+    <tr><td>테두리도 그 영역을 칠한 색 펜으로</td><td>체크</td><td>영역별 펜 색을 테두리에도 사용</td></tr>
+    <tr><td>딤플 보정 자동</td><td>체크</td><td>골프공 딤플 안쪽·가장자리의 감속/압력/겹침 보정</td></tr>
+    <tr><td>교환 직전·직후에 실행할 G-code</td><td>빈 칸</td><td>사진에서 비어 있음</td></tr>
+    <tr><td>교환 시험 펜 번호</td><td>1번 → 2번</td><td>사진의 시험 선택값</td></tr>
+  </tbody>
+</table>
+<div class="warn"><b class="t">ATC 위치값 주의</b>
+사진의 대기 위치 −10 mm와 도킹 위치 −248 mm 조합은 도킹 위치가 대기 위치보다 작다. 프로그램 자체 점검이 위치 방향 경고를 낼 수 있다. 실제 장치에서 전진·후진 방향, 이동 한계, 충돌 여부를 확인하기 전에는 이 값을 그대로 실행하지 않는다.</div>
+
+<h2>7-3. 교환 시험 G-code 예시 (사진의 미리보기 일부)</h2>
+<pre><code>M3 S90
+G4 P0.3
+; 펜 교환: 1번 -> 2번
+G0 X0 Y0 F3000
+M3 S160
+G0 Z60 F15000
+G0 A-248 F500
+G4 P0.6
+G0 Z0 F1000</code></pre>
+<p>모든 설정에서 고정으로 쓰는 명령이 아니다. 현재 설정으로 다시 생성해서 확인한다.</p>
+<div class="note"><b class="t">값이 서로 다른 이유</b>
+펜·속도 화면은 올림/내림 값이 170/100이다. 교환 시험 미리보기에는 <code>M3 S90</code>, <code>M3 S160</code>이 나온다. 소스 확인 결과 교환 순서는 <code>M3 S160</code>을 <b>고정 문자열</b>로 출력한다 (펜 올림/내림 설정과 무관). 이것은 S160만 설명한다. 미리보기의 <code>M3 S90</code>이 펜·속도 화면의 170과 다른 이유는 이 문서에서 확인하지 못했다. 시험 전에 현재 펜·속도 값, 교환 시험 미리보기, 최종 G-code를 모두 다시 확인한다.</div>
+
+<h2>7-4. 소스 초기 기본값과 사진 값의 차이</h2>
+<table>
+  <thead><tr><th>항목</th><th>소스 초기 기본값 (<code>Params</code>)</th><th>사진 기준 입력 예시</th></tr></thead>
+  <tbody>
+    <tr><td>펜 올림 서보</td><td>90</td><td>170</td></tr>
+    <tr><td>펜 내림 서보</td><td>30</td><td>100</td></tr>
+    <tr><td>슬롯 간 각도</td><td>5.4°</td><td>5.3°</td></tr>
+    <tr><td>ATC 대기 위치</td><td>0 mm</td><td>−10 mm</td></tr>
+    <tr><td>ATC 도킹 위치</td><td>50 mm</td><td>−248 mm</td></tr>
+    <tr><td>교환 높이</td><td>34.0 mm</td><td>34.0 mm</td></tr>
+    <tr><td>회전 속도</td><td>1000 도/분</td><td>1000 도/분</td></tr>
+    <tr><td>ATC 이동 속도</td><td>500 mm/분</td><td>500 mm/분</td></tr>
+  </tbody>
+</table>
+<p>사진의 설정을 쓰려면 화면에서 값을 직접 확인하고 저장한다. <b>기본값</b> 버튼은 사진 값이 아니라 소스 초기값으로 되돌린다.</p>
+
+<h2>7-5. 설정 파일 저장 위치</h2>
+<p>ATC 메커니즘 설정 창의 <b>저장</b> 버튼을 눌러야 별도 파일에 저장된다. 창 아래쪽에 빨간 <b>저장 안 됨</b>이 보이면 아직 저장 전이다. 이 설정은 작업 파일, 새 작업과 별개로 유지된다.</p>
+<pre><code>%USERPROFILE%\.eggbot_studio\atc_settings.json   (ATC 메커니즘 설정)
+%USERPROFILE%\.eggbot_studio\autosave.json       (자동 저장 작업, 20초 간격)</code></pre>
+<p class="small">프로그램은 시작할 때 ATC 설정 파일을 읽어 ATC 관련 필드를 덮어쓴다. 작업 파일의 ATC 값보다 설정 파일이 우선한다.</p>
+
+<!-- ============ 8 문제 해결 ============ -->
+<h1>8. 문제 해결</h1>
+<table>
+  <thead><tr><th style="width:21%">증상 / 메시지</th><th style="width:30%">가능한 원인</th><th>확인 및 해결 방법</th></tr></thead>
+  <tbody>
+    <tr><td>COM 포트가 목록에 없음</td><td>충전 전용 USB 케이블, 드라이버 미설치, 컨트롤러 전원 꺼짐</td><td>데이터 USB 케이블 사용. 컨트롤러 전원 확인. Windows 장치 관리자에서 포트 인식 확인. 드라이버 설치 후 새로고침.</td></tr>
+    <tr><td>포트 연결 실패 / 접근 거부</td><td>다른 프로그램이 COM 포트 사용 중</td><td>Arduino 시리얼 모니터, UGS 등을 종료하고 다시 연결.</td></tr>
+    <tr><td>연결했지만 GRBL 응답이 없음</td><td>잘못된 COM 포트·통신 속도, 펌웨어 또는 전원 문제</td><td>기본 속도 115200 bps 확인. 컨트롤러 전원·USB·펌웨어 확인. (3초 넘게 수신이 없으면 자가 점검이 "무응답"으로 표시한다.)</td></tr>
+    <tr><td>pyserial이 없다는 안내</td><td>EXE에 pyserial 미포함, 또는 소스 실행 환경에 미설치</td><td>EXE 재빌드 시 pyserial 포함 확인. 소스 실행이면 <code>python -m pip install pyserial</code>.</td></tr>
+    <tr><td>이미지 열기 기능이 동작하지 않음</td><td>Pillow 누락, 또는 손상된 이미지</td><td>EXE에 Pillow 포함 확인. 소스 실행이면 <code>python -m pip install pillow</code>. 다른 이미지로 재시도.</td></tr>
+    <tr><td>그림 영역이 추출되지 않음</td><td>배경색과 그림색 차이가 작음, 또는 추출 방식 불일치</td><td>선 추출 방식을 바꾸고 배경 민감도·밝기 임계값·최소 영역 크기를 조정. 직접 그리기 사용.</td></tr>
+    <tr><td>펜이 올라가거나 내려가지 않음</td><td>서보 펌웨어가 <code>M96 A값</code>을 지원하지 않음, 또는 채널·방향·배선 불일치</td><td>펌웨어의 M96 지원 확인. 기본 채널 A(D11), 서보 방향, 실제 배선 확인. (6-4의 저장소 차이 표 참고)</td></tr>
+    <tr><td>ATC에서 <code>error:20</code> 또는 축 오류</td><td>펌웨어가 Z/A 등 요청한 축을 지원하지 않음</td><td>기본 GRBL 1.1의 축 지원 범위 확인. 5축 이상 펌웨어와 보드 축 설정 점검.</td></tr>
+    <tr><td>ATC 위치 경고가 표시됨</td><td>도킹 위치와 대기 위치의 부호·순서 또는 이동 범위가 맞지 않음</td><td>실제 기계의 좌표 방향과 리밋 범위를 측정하고 위치값을 다시 설정.</td></tr>
+    <tr><td>GRBL ALARM 표시</td><td>홈·리밋·이동 범위 또는 좌표 설정 문제</td><td>원인을 먼저 확인하고 기계가 안전한 상태인지 본 뒤 필요하면 <code>$X</code>. 잠금 해제만으로 원인이 해결되지 않는다.</td></tr>
+    <tr><td>G-code 범위 초과 경고</td><td>그림 위치·크기·회전이 기계 작업 영역 밖</td><td>위치·크기를 줄이거나 이동. 축 설정과 최대 이동 범위 확인. (범위 초과 상태에서는 그리기 시작이 막힌다.)</td></tr>
+    <tr><td>저장한 ATC 설정이 다음 실행에 적용되지 않음</td><td>설정 창에서 저장하지 않음, 또는 사용자 폴더 쓰기 실패</td><td>ATC 메커니즘 설정 창에서 <b>저장</b> 클릭. <code>%USERPROFILE%\.eggbot_studio</code> 쓰기 권한 확인.</td></tr>
+    <tr><td>프로그램을 다시 켰더니 이전 그림이 나타남</td><td>자동 저장 작업 복원 기능</td><td>새 작업은 <b>새로 시작</b>. 필요한 기존 작업은 먼저 <code>.eggbot</code>으로 저장.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ 9 안전 ============ -->
+<h1>9. 안전 주의사항</h1>
+<ol>
+  <li><b>사진 속 수치는 참고 입력값이다.</b> ATC 대기 −10 mm, 도킹 −248 mm, 슬롯 간격 5.3° 등은 실제 장비의 측정값과 기구 치수에 맞는지 확인한다.</li>
+  <li><b>ATC 교환 시험은 실제 모터를 움직인다.</b> 3D 미리보기만 보고 바로 시험하지 않는다. 펜·달걀·주변 장애물과 충돌할 가능성을 확인한다. 처음에는 펜을 빼고 낮은 속도로 단계별로 시험한다.</li>
+  <li><b>소프트 리밋 자동 해제.</b> 작업 준비 과정에서 GRBL <code>$20</code>이 켜져 있으면 프로그램이 <code>$20=0</code>을 <b>사용자 확인 없이</b> 보낸다. 이 값은 컨트롤러에 저장된다. 로그에는 "다시 켜려면 직접 명령창에 <code>$20=1</code>"이라고 남는다. 실행 전에 <code>$20</code> 상태와 기계의 물리적 이동 한계를 확인한다. 소프트 리밋이 꺼지면 범위를 넘는 이동을 소프트웨어가 막지 못한다.</li>
+  <li><b>비상 정지는 소프트웨어 정지이다.</b> GRBL 홀드(<code>!</code>)와 소프트 리셋(Ctrl-X)을 보낸다. 물리 비상정지 스위치를 대신하지 않는다. 위험하면 물리 비상정지나 전원 차단을 쓴다.</li>
+  <li><b>서보·스테퍼 전원과 배선을 확인한다.</b> 보드 핀, 서보 채널, 드라이버, 모터 전압, 공통 접지가 실제 회로와 일치해야 한다.</li>
+  <li><b>자가 점검과 3D 미리보기는 기계 안전을 보증하지 않는다.</b> 좌표, ATC 이동, 펜 올림/내림을 직접 확인하고 저속·무부하로 먼저 시험한다.</li>
+  <li><b>종료 절차.</b> 작업이 끝나면 펜을 올리고, 기계를 안전한 위치에 두고, 연결을 해제하고, 전원을 끈다.</li>
+</ol>
+<div class="note"><b class="t">취소·오류 중단 시 동작</b>
+작업 취소(<b>초기화</b>)는 소프트 리셋 없이 대기열만 지운다. 이미 GRBL 버퍼에 들어간 마지막 몇 개 이동은 그대로 끝난다 (소스 주석). GRBL 오류로 작업이 중단될 때 펜을 자동으로 올리는 명령은 소스에 없다. 중단 후에는 펜 상태를 직접 확인한다.</div>
+
+<!-- ============ 10 구조 ============ -->
+<h1>10. 소프트웨어 구조</h1>
+<p>프로그램은 Python 단일 파일(7,283줄)이다. GUI는 Tkinter이고 외부 의존은 Pillow와 pyserial뿐이다. 소스는 다음 영역으로 나뉜다.</p>
+<table>
+  <thead><tr><th style="width:21%">구성요소</th><th style="width:15%">소스 위치</th><th>역할</th></tr></thead>
+  <tbody>
+    <tr><td><code>Params</code></td><td>101~207행</td><td>작업 설정 전체를 담는 dataclass. 물체, 선 추출, 위치, 펜·속도, 펜 교환, 보정, ATC 필드.</td></tr>
+    <tr><td><code>AxisMap</code></td><td>218행</td><td>X/Y 축 역할과 방향 반전.</td></tr>
+    <tr><td><code>Shape</code></td><td>228행</td><td>달걀·공 형상. 높이별 반지름, 표면 좌표, 딤플 위치와 깊이.</td></tr>
+    <tr><td>영상 처리 함수</td><td>312~720행</td><td><code>flood_label</code>, <code>trace_outlines</code>, <code>dedupe_overlap</code>, <code>rdp</code>, <code>hatch_strokes</code>, <code>order_strokes</code> 등.</td></tr>
+    <tr><td><code>Artwork</code></td><td>722행</td><td>이미지 불러오기, 영역 추출(<code>analyze</code>), 영역·펜 지정, 직접 그린 선, 선 생성(<code>build</code>), 표면 변환(<code>to_surface</code>).</td></tr>
+    <tr><td>G-code 생성</td><td>1240~1850행</td><td><code>to_servo</code>, <code>change_lines</code>, <code>mech_compile</code>, <code>build_gcode</code>, <code>parse_gcode</code>.</td></tr>
+    <tr><td><code>Timeline</code></td><td>1852행</td><td>3D 재생용 시간축. 시간 추정과 자세 계산.</td></tr>
+    <tr><td><code>GrblLink</code></td><td>2034행</td><td>시리얼 연결, 문자 수 기반 스트리밍, 일시정지·재개·정지, 알람·오류 처리.</td></tr>
+    <tr><td><code>Preview3D</code></td><td>2629행</td><td>3D 미리보기 창. 달걀, 펜 팔, 매거진을 그리고 G-code를 재생.</td></tr>
+    <tr><td><code>App</code></td><td>3734~5664행</td><td>메인 창. 3열 레이아웃, 도구, 기계 제어, 저장·불러오기.</td></tr>
+    <tr><td>도구 창</td><td>5670~7270행</td><td><code>SelfCheckDialog</code>, <code>CalibrationDialog</code>, <code>OriginDialog</code>, <code>AtcDialog</code>, <code>AtcSettingsDialog</code>, <code>MechDialog</code>, <code>GcodeEditor</code>.</td></tr>
+    <tr><td><code>main()</code></td><td>7276행</td><td>진입점. <code>App().mainloop()</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>10-1. 화면 구성</h2>
+<ul>
+  <li><b>왼쪽 패널</b>: 이미지 열기, G코드 저장, G코드 확인·수정, 3D 미리보기, 작업 저장·불러오기, 도구 창 열기(원점 자동 조정, 보정, 자가 점검). 탭 5개: 물체 / 선 추출 / 위치·크기 / 펜·속도 / 펜 교환(ATC).</li>
+  <li><b>가운데 패널</b>: 원본 이미지와 도구(영역 채우기, 색 칠하기, 직접 그리기, 지우개), 펜 팔레트, 채우기 옵션(간격 0.3~2.0 mm, 각도 0~90°).</li>
+  <li><b>오른쪽 패널</b>: <b>펼친 모습</b>. 달걀 표면을 각도–mm 격자로 펼친 화면이다. 범위 밖 영역은 붉게 표시한다. 상자 이동·크기·회전 핸들과 마우스 휠 조작을 지원한다.</li>
+  <li><b>아래 패널</b>: 포트, 연결, 펜 올림/내림, 원점, 조그, 그리기 시작, 일시정지, 비상 정지, 진행률, 직접 명령, 로그.</li>
+</ul>
+
+<h2>10-2. 스레드와 통신 구조</h2>
+<p>시리얼 송수신은 작업 스레드 1개가 맡는다. UI(Tk 메인 스레드)는 <code>queue.Queue</code> 이벤트 큐로만 통신한다. UI는 60 ms마다 큐를 비우며 로그, 상태, 진행률, 완료, 준비 완료 이벤트를 처리한다.</p>
+<ul>
+  <li>스트리밍: 한 줄씩 보내면서 미확인 바이트 합이 <code>RX_LIMIT = 118</code>(GRBL 수신 버퍼 127바이트 미만)을 넘지 않게 한다. <code>ok</code>를 받으면 빼 준다.</li>
+  <li>상태 조회 <code>?</code>를 약 0.6초마다 보낸다.</li>
+  <li>일시정지 <code>!</code>, 재개 <code>~</code>, 비상 정지는 <code>!</code> 후 Ctrl-X(0x18).</li>
+  <li><code>error</code>/<code>alarm</code>을 받으면 줄 번호·원문·한국어 설명을 기록하고 작업을 멈춘다. <b>오류 기록</b> 창에서 본다.</li>
+  <li>작업 시작 전 준비 단계에서 알람 해제(<code>$X</code>)와 <code>$20</code> 확인을 한다 (9장 참고).</li>
+</ul>
+
+<h2>10-3. 저장 형식</h2>
+<p><code>.eggbot</code>은 JSON 텍스트이다. 앱 이름, 버전, <code>Params</code>, 축 설정, 이미지 이름, 이미지 PNG(base64), 선택된 영역, 영역별 펜, 원점 정보, 직접 그린 선을 담는다. 쓸 때는 임시 파일에 먼저 쓰고 <code>os.replace</code>로 교체한다. 쓰다가 중단돼도 기존 파일이 깨지지 않는다.</p>
+
+<!-- ============ 11 알고리즘 ============ -->
+<h1>11. 핵심 알고리즘</h1>
+<h2>11-1. 영역 추출 (<code>Artwork.analyze</code>)</h2>
+<table>
+  <thead><tr><th style="width:22%">모드</th><th>처리</th></tr></thead>
+  <tbody>
+    <tr><td>자동(배경 제거)</td><td>테두리 픽셀의 채널별 중앙값을 배경색으로 잡는다. 각 픽셀과 배경색의 RGB 거리가 <code>bg_tol</code>보다 크면 전경이다. 닫힘(closing)과 중앙값 필터로 잡티를 정리한다. 전경 비율이 0.2~85 %면 채택한다. 실패하면 Otsu 임계값, 그래도 실패하면 회색조 Otsu, 마지막으로 밝기 임계값을 쓴다. 선택 이유를 화면 메모로 알려 준다.</td></tr>
+    <tr><td>색 영역 나누기</td><td>Median-cut으로 색을 줄인다 (2~16색, 기본 6). 팔레트 색 거리가 <code>color_merge</code> 이하이면 union-find로 합친다. 같은 값의 4-연결 성분을 영역으로 삼고, 배경과 너무 작은 영역을 버린다. 맞닿은 영역의 중복 윤곽은 제거한다.</td></tr>
+    <tr><td>어두운 선(밝기)</td><td>밝기가 임계값(기본 128)보다 어두운 픽셀이 선이다.</td></tr>
+  </tbody>
+</table>
+<p>공통 후처리: <code>flood_label</code>이 4-연결 성분을 만들고 최소 영역보다 작은 덩어리를 지운다. <code>trace_outlines</code>는 픽셀 경계 변으로 방향 간선을 만든 뒤, 꼭짓점 그래프를 따라 닫힌 루프를 이어 윤곽을 얻는다. 안쪽 구멍 경계도 함께 얻는다.</p>
+
+<h2>11-2. 선 생성 (<code>Artwork.build</code>)</h2>
+<ol>
+  <li><b>축척</b>: <code>mmpp = height_mm / 이미지 높이(px)</code>.</li>
+  <li><b>테두리</b>: [1 2 1]/4 필터로 부드럽게 한 뒤 RDP로 단순화한다. 허용 오차는 <code>max(0.5 px, simplify_mm / mmpp)</code>이다. <code>dedupe_overlap</code>이 이미 그린 구간과 겹치는 부분을 한 번만 남긴다.</li>
+  <li><b>채우기</b>: 선택된 영역만 채운다. 각도 <code>fill_angle</code>(기본 45°)의 평행선을 <code>fill_gap_mm</code>(기본 0.5 mm) 간격으로 긋는다. 지그재그 옵션이 켜져 있으면 이웃 줄을 번갈아 뒤집어 잇는다. 이을 구간이 모두 영역 안일 때만 잇고, 아니면 펜을 든다.</li>
+  <li><b>직접 그린 선</b>: RDP로 단순화한다 (허용 오차 <code>max(0.4 px, 0.2 mm / mmpp)</code>).</li>
+  <li><b>높이 제한</b>: 펜 팔이 닿는 한계 높이 <code>hlim = min(반길이 × 0.995, arm_len × sin(arm_max_deg) × 0.999)</code>를 넘는 점에서 선을 끊는다. 기본값에서 약 28.25 mm이다.</li>
+</ol>
+
+<h2>11-3. 달걀 표면 매핑 (<code>to_surface</code>, <code>Shape</code>)</h2>
+<pre><code>dx = (x - cx) * stretch_x ;  dy = y - cy
+rx = dx*cos(rot) - dy*sin(rot) ;  ry = dx*sin(rot) + dy*cos(rot)
+deg = pos_x_deg + rx * mmpp * 360 / circumference(pos_y_mm)
+h   = pos_y_mm  - ry * mmpp            # 이미지 y는 아래가 +
+
+radius(h) = R * sqrt(1 - v^2) * (1 + p*v),  v = h / half   # R=지름/2, p=pointiness</code></pre>
+<p>이미지 좌표를 (회전각 deg, 높이 h) 표면 좌표로 바꾼다. 가로 mm를 각도로 바꿀 때는 <code>pos_y_mm</code> 높이의 원주를 쓴다. 따라서 달걀의 끝으로 갈수록 실제 폭이 좁아진다 (한계로 13장에 적었다).</p>
+
+<h2>11-4. 펜 팔 좌표 변환 (<code>arm_out</code>)</h2>
+<p>펜 팔 모델은 <code>h = L · sin θ</code>이다 (L = <code>arm_len_mm</code> 기본 40 mm). 높이 h를 팔 각도 θ로 바꿔 X축 값으로 쓴다. θ는 <code>±arm_max_deg</code>(기본 45°)로 제한된다. 회전각 deg는 <code>deg × cal_rot_scale + cal_rot_off</code>로 보정하고 Y축 값으로 쓴다. 축 설정에 따라 X/Y를 바꾸거나 반전한다.</p>
+
+<h2>11-5. 그리는 순서 (<code>order_by_pen</code>, <code>order_strokes</code>)</h2>
+<ul>
+  <li>펜 번호 순으로 묶는다. <b>면적 큰 색부터</b>를 켜면 면적 순이다. 같은 펜 안에서는 채우기 → 테두리 → 직접 그린 선 순서이다.</li>
+  <li>각 묶음은 가장 가까운 시작점을 고르는 탐욕 정렬이다. 거리는 각도를 mm로 바꿔 계산한다. 선이 2500개를 넘으면 3 mm 띠 단위 훑기로 근사한다.</li>
+  <li>닫힌 선은 가장 가까운 꼭짓점에서 시작하도록 돌린다. 필요하면 선 방향을 뒤집는다.</li>
+</ul>
+
+<h2>11-6. 딤플 보정 (골프공)</h2>
+<p>3D 미리보기에는 딤플 무늬를 그린다. G-code에는 무늬가 아니라 <b>보정</b>만 들어간다. 자동 모드는 선을 1 mm로 쪼개고, 딤플 안쪽·가장자리 구간에서 속도를 45 %로 줄이고 펜을 8만큼 더 누른다. 선 길이의 15 % 이상이 딤플 구간이면 같은 선을 반복할 수 있다 (기본 반복 횟수 1).</p>
+
+<!-- ============ 12 G-code ============ -->
+<h1>12. G-code와 ATC 교환 시퀀스</h1>
+<h2>12-1. G-code 구조 (<code>build_gcode</code>)</h2>
+<ol>
+  <li>헤더 주석(색 순서, 보정값)</li>
+  <li><code>G21</code>, <code>G90</code>, 펜 올림 <code>M3 S&lt;pen_up&gt;</code></li>
+  <li>펜을 2개 이상 쓰고 ATC 모드이면 초기 자세 <code>G0 Z&lt;각도&gt; A&lt;대기&gt;</code></li>
+  <li>선마다: 펜이 바뀌면 교환 블록 → <code>G0 X Y</code> (이동) → 펜 내림 → <code>G4</code> → <code>G1 …</code> (그리기) → 펜 올림 → <code>G4</code></li>
+  <li>끝: 펜 올림, (옵션) 처음 펜으로 되돌려 교체, (옵션) <code>G0 X0 Y0</code>, <code>M2</code></li>
+</ol>
+<p>이 프로그램은 <code>G92</code>나 홈 명령을 G-code에 넣지 않는다. 시작 시점의 기계 좌표를 0으로 가정한다. 작업 전에 <b>여기를 원점으로</b> 또는 원점 도구 창으로 원점을 맞춘다.</p>
+
+<h2>12-2. 기본 펜 교환 순서</h2>
+<p>펜 교환은 텍스트 스크립트(<code>mech_script</code>)로 정의된다. 소스의 기본 스크립트가 만드는 순서는 다음과 같다. 변수 A = 뗄 펜 슬롯 각도, B = 끼울 펜 슬롯 각도, H = 접근 보정각, DOCK/PARK = 도킹/대기 위치이다.</p>
+<figure>
+<svg viewBox="0 0 760 232" width="760" xmlns="http://www.w3.org/2000/svg" font-family="Apple SD Gothic Neo, sans-serif">
+  <defs><marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#586069"/></marker></defs>
+  <g font-size="11" text-anchor="middle" fill="#1b1f24">
+    <!-- row 1 -->
+    <rect x="4" y="12" width="116" height="62" rx="6" fill="#f3f6fa" stroke="#0b3d6e"/><text x="62" y="30" font-weight="700">① 원점으로</text><text x="62" y="47" font-size="10">G0 X0 Y0</text><text x="62" y="62" font-size="10">M3 S160</text>
+    <rect x="136" y="12" width="116" height="62" rx="6" fill="#f3f6fa" stroke="#0b3d6e"/><text x="194" y="30" font-weight="700">② 매거진 회전</text><text x="194" y="47" font-size="10">Z = A + H</text><text x="194" y="62" font-size="10">(H = 접근 보정각)</text>
+    <rect x="268" y="12" width="116" height="62" rx="6" fill="#f3f6fa" stroke="#0b3d6e"/><text x="326" y="30" font-weight="700">③ 도킹</text><text x="326" y="47" font-size="10">A축 = DOCK</text><text x="326" y="62" font-size="10">+ 대기 0.6 s</text>
+    <rect x="400" y="12" width="116" height="62" rx="6" fill="#fff4e5" stroke="#e8a33d"/><text x="458" y="30" font-weight="700">④ 펜 떼기</text><text x="458" y="47" font-size="10">mount none</text><text x="458" y="62" font-size="10">(G-code 출력 없음)</text>
+    <rect x="532" y="12" width="116" height="62" rx="6" fill="#f3f6fa" stroke="#0b3d6e"/><text x="590" y="30" font-weight="700">⑤ 슬롯 A로</text><text x="590" y="47" font-size="10">Z = A</text><text x="590" y="62" font-size="10">+ 대기</text>
+    <!-- row 2 -->
+    <rect x="4" y="128" width="116" height="62" rx="6" fill="#f3f6fa" stroke="#0b3d6e"/><text x="62" y="146" font-weight="700">⑥ 반 후퇴</text><text x="62" y="163" font-size="10">A축 = DOCK/2</text><text x="62" y="178" font-size="10">(대기 위치 쪽으로)</text>
+    <rect x="136" y="128" width="116" height="62" rx="6" fill="#f3f6fa" stroke="#0b3d6e"/><text x="194" y="146" font-weight="700">⑦ 새 펜 슬롯 B</text><text x="194" y="163" font-size="10">Z = B</text><text x="194" y="178" font-size="10">+ 대기</text>
+    <rect x="268" y="128" width="116" height="62" rx="6" fill="#f3f6fa" stroke="#0b3d6e"/><text x="326" y="146" font-weight="700">⑧ 도킹</text><text x="326" y="163" font-size="10">A축 = DOCK</text><text x="326" y="178" font-size="10">+ 대기</text>
+    <rect x="400" y="128" width="116" height="62" rx="6" fill="#e9f6ec" stroke="#2e8b57"/><text x="458" y="146" font-weight="700">⑨ 펜 끼우기</text><text x="458" y="163" font-size="10">mount to</text><text x="458" y="178" font-size="10">(G-code 출력 없음)</text>
+    <rect x="532" y="128" width="116" height="62" rx="6" fill="#f3f6fa" stroke="#0b3d6e"/><text x="590" y="146" font-weight="700">⑩ 후퇴·복귀</text><text x="590" y="163" font-size="10">Z = B + H → A = PARK</text><text x="590" y="178" font-size="10">Z = HOME + 대기</text>
+  </g>
+  <g stroke="#586069" stroke-width="1.4" marker-end="url(#ar3)" fill="none">
+    <line x1="120" y1="43" x2="134" y2="43"/><line x1="252" y1="43" x2="266" y2="43"/><line x1="384" y1="43" x2="398" y2="43"/><line x1="516" y1="43" x2="530" y2="43"/>
+    <path d="M648 43 L700 43 L700 105 L62 105 L62 126"/>
+    <line x1="120" y1="159" x2="134" y2="159"/><line x1="252" y1="159" x2="266" y2="159"/><line x1="384" y1="159" x2="398" y2="159"/><line x1="516" y1="159" x2="530" y2="159"/>
+  </g>
+  <text x="380" y="222" text-anchor="middle" font-size="10" fill="#586069">교환 속도: 회전축 1000 도/분, ATC 이송 500 mm/분, 대기 600 ms (기본값). 교환 전에 펜을 올린다. 교환이 끝나면 다음 선의 시작점으로 이동한 뒤 펜을 내린다.</text>
+</svg>
+<figcaption>그림 3. 기본 펜 교환 스크립트의 실행 순서 (소스 <code>MECH_DEFAULT_SCRIPT</code>)</figcaption>
+</figure>
+<p>스크립트 문법은 단순하다. 명령은 <code>carriage</code>, <code>turret</code>, <code>atc</code>, <code>wait</code>, <code>mount</code>, <code>gcode</code>이다. 조건은 <code>when 조건:</code> 접두로 붙인다. 수식은 <code>ast</code> 모듈로 검사해 사칙연산, 비교, <code>min/max/abs</code>만 허용한다. 임의 코드는 실행되지 않는다. 기구가 바뀌면 코드를 고치지 않고 스크립트만 고친다. <code>mount</code> 단계는 G-code를 출력하지 않는다 (소스: 출력 없음). <code>mech_compile</code>은 충돌 위험(도킹한 채 매거진 회전 등)을 경고한다.</p>
+
+<h2>12-3. 자가 점검 (<code>run_selfcheck</code>)</h2>
+<p><b>자가 점검</b> 창은 다음을 검사해 ok / 경고 / 오류로 표시한다.</p>
+<ul>
+  <li>Pillow·pyserial 설치, 자동 저장 폴더 쓰기 가능 여부</li>
+  <li>펜 올림/내림 값 차이(10 이상), 그리기 속도와 이동 속도 관계, 보정 배율 범위(0.8~1.25)</li>
+  <li>ATC 축 글자가 한 글자이고 서로 겹치지 않는지, 5축 펌웨어 필요 안내</li>
+  <li>G-code 끝의 <code>M2</code>와 펜 올림</li>
+  <li>GRBL <code>$$</code> 값: <code>$30</code>, <code>$100/$101</code>, 속도·이동 한계</li>
+  <li>연결 후 3초 넘는 무응답, 이번 실행에서 원점을 정했는지</li>
+</ul>
+<p>자가 점검은 참고용이다. 그리기 시작은 자가 점검을 강제하지 않는다. 범위 초과(<code>out_of_range</code>)만 시작을 막는다.</p>
+
+<!-- ============ 13 한계 ============ -->
+<h1>13. 한계 및 향후 과제</h1>
+<p>이 장은 소스 읽기와 저장소 문서에서 확인한 한계를 적는다. 프로그램을 실행하거나 기계에 연결해 확인한 것이 아니다.</p>
+
+<h2>13-1. 검증 범위</h2>
+<ul>
+  <li>기계 실측과 실기 시험 결과는 이 문서에 없다. 설정값은 설정 화면과 소스 초기값이다.</li>
+  <li>서보 <code>M96</code> 동작, 시리얼 스트리밍, ATC 이동 수치는 실기에서 확인해야 한다.</li>
+  <li>EXE 빌드와 Windows 실행은 이 문서 작성 환경(macOS)에서 하지 않았다.</li>
+</ul>
+
+<h2>13-2. 펌웨어와 하드웨어 의존</h2>
+<ul>
+  <li><b>5축 + M96 펌웨어 필수.</b> 일반 GRBL 1.1은 ATC 축과 서보 명령을 처리하지 못한다.</li>
+  <li><b>저장소 설계와 서보 방식이 다르다</b> (<code>M96 A</code>/D11 대 D6 스핀들 PWM). 실제 기계의 배선과 펌웨어를 프로그램 설정에 맞춘다 (6-4).</li>
+  <li>엔드스탑이 없으면 원점을 손으로 맞춘다. 중간에 멈춘 작업은 펜 위치를 손으로 정리해야 한다.</li>
+</ul>
+
+<h2>13-3. 알려진 제한과 개선 항목</h2>
+<table>
+  <thead><tr><th style="width:5%">#</th><th style="width:35%">항목</th><th>설명과 개선 방향</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>메인 패널 조그 버튼</td><td>소스에서 조그가 <code>grbl.send_raw</code>를 호출하는데 <code>GrblLink</code>에 해당 메서드가 없다. 이 경로의 버튼 동작은 보장되지 않는다. 원점 도구 창의 조그는 별도 경로로 구현되어 있다. 연결 후 <code>GrblLink.send</code>를 쓰도록 고친다.</td></tr>
+    <tr><td>2</td><td>소프트 리밋 자동 해제</td><td>준비 단계에서 <code>$20=0</code>을 확인 없이 기록한다. 사용자 확인 대화상자를 추가한다.</td></tr>
+    <tr><td>3</td><td>교환 시 서보 값 고정</td><td>교환 순서가 <code>M3 S160</code>을 고정 출력한다. 펜 올림 설정과 연동한다.</td></tr>
+    <tr><td>4</td><td>G-code 저장 경로 차이</td><td>메인 저장은 <code>M96</code>으로 변환하고 편집창 저장은 원문 그대로이다. 저장 방식을 통일한다.</td></tr>
+    <tr><td>5</td><td>표면 매핑 왜곡</td><td>가로 mm를 각도로 바꿀 때 한 높이의 원주만 쓴다. 높이별 원주로 보정한다.</td></tr>
+    <tr><td>6</td><td>시간 추정 이중 계산</td><td>G-code 통계의 예상 시간과 3D 재생 시간이 서로 다른 방식으로 계산된다. 하나로 합친다.</td></tr>
+    <tr><td>7</td><td>긴 G-code 줄</td><td>한 줄이 118바이트를 넘으면 전송이 멈출 수 있다. 사용자 정의 교환 G-code를 짧게 쓰거나 전송기에서 거른다.</td></tr>
+    <tr><td>8</td><td>ATC 설정 우선순위</td><td>시작할 때 ATC 설정 파일이 작업 파일의 ATC 값을 덮어쓴다. 우선순위를 화면에 알린다.</td></tr>
+    <tr><td>9</td><td>원점 확인</td><td>그리기 시작은 원점 설정 여부를 확인 대화상자로만 묻는다. 원점 미설정 시 시작을 막는다.</td></tr>
+    <tr><td>10</td><td>실측 보정</td><td>펜 팔 길이, 회전 배율(<code>cal_rot_scale</code>), 서보 값은 실측 후 보정 창에서 입력해야 한다.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ 부록 ============ -->
+<h1>부록. 관련 저장소 문서</h1>
+<p>저장소 <code>https://github.com/diskeyd/eggbot-atc</code> 는 같은 프로젝트의 초기 설계 자료이다. 이 문서의 프로그램은 저장소의 SVG 변환기와 다른 프로그램이다. 하드웨어 근거 자료로 참고한다.</p>
+<table>
+  <thead><tr><th style="width:34%">파일</th><th>내용</th></tr></thead>
+  <tbody>
+    <tr><td><code>README.md</code></td><td>저장소 개요, 명령 4개(<code>check</code>, <code>convert</code>, <code>settings</code>, <code>send</code>), 영점 잡기, ATC 펜 교체, 서보 주의</td></tr>
+    <tr><td><code>docs/부품-목록.csv / .md</code></td><td>전자·기구 부품 표, 구매 목록</td></tr>
+    <tr><td><code>docs/배선도.md</code></td><td>전원, 서보, 모터, 드라이버 배선 (D6 서보 기준)</td></tr>
+    <tr><td><code>docs/기구-치수.md</code></td><td>도면에서 옮긴 부품 치수와 도면 확인 사항</td></tr>
+    <tr><td><code>docs/측정-체크리스트.md</code></td><td>기계 측정 순서와 기록표</td></tr>
+    <tr><td><code>docs/설정값-목록.md</code></td><td>설정값 전체(추정치·튜닝값 포함)</td></tr>
+    <tr><td><code>docs/변환프로그램-비교.md</code></td><td>팀원 변환 프로그램과 저장소 변환기 비교</td></tr>
+    <tr><td><code>firmware/</code></td><td>grbl-Mega-5X D6 PWM 빌드와 빌드 메모</td></tr>
+  </tbody>
+</table>
+<p class="small">문서 끝.</p>
+
+</body>
+</html>
